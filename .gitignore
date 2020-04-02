@@ -1,0 +1,8 @@
+*.user*
+*.sln
+*.vcxproj*
+*.qm
+/pch.h.cpp
+*.ini
+*.aps
+*.stash

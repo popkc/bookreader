@@ -1,0 +1,344 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>615</width>
+    <height>526</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>POPKC阅读软件</string>
+  </property>
+  <widget class="QWidget" name="centralWidget">
+   <layout class="QHBoxLayout" name="horizontalLayout">
+    <property name="spacing">
+     <number>0</number>
+    </property>
+    <property name="leftMargin">
+     <number>0</number>
+    </property>
+    <property name="topMargin">
+     <number>0</number>
+    </property>
+    <property name="rightMargin">
+     <number>0</number>
+    </property>
+    <property name="bottomMargin">
+     <number>0</number>
+    </property>
+    <item>
+     <widget class="WidgetFull" name="widgetFull" native="true">
+      <property name="focusPolicy">
+       <enum>Qt::ClickFocus</enum>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="WidgetOneLine" name="widgetOneLine" native="true"/>
+    </item>
+    <item>
+     <widget class="QScrollBar" name="verticalScrollBar">
+      <property name="orientation">
+       <enum>Qt::Vertical</enum>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menuBar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>615</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuFile">
+    <property name="title">
+     <string>文件(&amp;F)</string>
+    </property>
+    <widget class="QMenu" name="menuRecentFiles">
+     <property name="title">
+      <string>最近打开的文件(&amp;F)</string>
+     </property>
+    </widget>
+    <addaction name="actionOpen"/>
+    <addaction name="menuRecentFiles"/>
+    <addaction name="separator"/>
+    <addaction name="actionExit"/>
+   </widget>
+   <widget class="QMenu" name="menuCodec">
+    <property name="title">
+     <string>编码(&amp;C)</string>
+    </property>
+    <widget class="QMenu" name="menuLmcl">
+     <property name="title">
+      <string>乱码处理(&amp;L)</string>
+     </property>
+     <addaction name="actionMoveNext"/>
+     <addaction name="actionMovePrev"/>
+    </widget>
+    <addaction name="actionGBK"/>
+    <addaction name="actionBig5"/>
+    <addaction name="actionUTF_8"/>
+    <addaction name="actionUTF_16"/>
+    <addaction name="actionUTF_16BE"/>
+    <addaction name="actionShift_JIS"/>
+    <addaction name="actionEUC_KR"/>
+    <addaction name="separator"/>
+    <addaction name="menuLmcl"/>
+   </widget>
+   <widget class="QMenu" name="menuConfig">
+    <property name="title">
+     <string>设置(&amp;S)</string>
+    </property>
+    <addaction name="actionConfig"/>
+    <addaction name="actionShowTray"/>
+    <addaction name="separator"/>
+    <addaction name="actionFullMode"/>
+    <addaction name="actionOneLineMode"/>
+   </widget>
+   <widget class="QMenu" name="menuAutoRead">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
+    <property name="title">
+     <string>自动阅读(&amp;R)</string>
+    </property>
+    <addaction name="actionRead"/>
+    <addaction name="actionAutoRoll"/>
+   </widget>
+   <widget class="QMenu" name="menu_3">
+    <property name="title">
+     <string>关于(&amp;A)</string>
+    </property>
+    <addaction name="actionAboutQt"/>
+   </widget>
+   <widget class="QMenu" name="menuJump">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
+    <property name="title">
+     <string>跳转(&amp;J)</string>
+    </property>
+    <addaction name="actionSearch"/>
+    <addaction name="actionIndex"/>
+   </widget>
+   <addaction name="menuFile"/>
+   <addaction name="menuCodec"/>
+   <addaction name="menuConfig"/>
+   <addaction name="menuAutoRead"/>
+   <addaction name="menuJump"/>
+   <addaction name="menu_3"/>
+  </widget>
+  <action name="actionOpen">
+   <property name="text">
+    <string>打开(&amp;O)...</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+O</string>
+   </property>
+  </action>
+  <action name="actionExit">
+   <property name="text">
+    <string>退出(&amp;X)</string>
+   </property>
+  </action>
+  <action name="actionGBK">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string notr="true">&amp;GBK</string>
+   </property>
+  </action>
+  <action name="actionBig5">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string notr="true">&amp;Big5</string>
+   </property>
+  </action>
+  <action name="actionUTF_8">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string notr="true">UTF-&amp;8</string>
+   </property>
+  </action>
+  <action name="actionUTF_16">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string notr="true">&amp;UTF-16</string>
+   </property>
+  </action>
+  <action name="actionMoveNext">
+   <property name="text">
+    <string>后移一个字节(&amp;N)</string>
+   </property>
+  </action>
+  <action name="actionMovePrev">
+   <property name="text">
+    <string>前移一个字节(&amp;P)</string>
+   </property>
+  </action>
+  <action name="actionShift_JIS">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string notr="true">Shift_&amp;JIS</string>
+   </property>
+  </action>
+  <action name="actionSystem">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string notr="true">System</string>
+   </property>
+  </action>
+  <action name="actionwindows_949">
+   <property name="text">
+    <string>windows-949</string>
+   </property>
+  </action>
+  <action name="actionEUC_KR">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string notr="true">EUC-&amp;KR</string>
+   </property>
+  </action>
+  <action name="actionConfig">
+   <property name="text">
+    <string>设置(&amp;S)...</string>
+   </property>
+  </action>
+  <action name="actionFullMode">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>完整模式(&amp;F)</string>
+   </property>
+  </action>
+  <action name="actionOneLineMode">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>一行模式(&amp;O)</string>
+   </property>
+  </action>
+  <action name="actionRead">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>朗读(&amp;R)</string>
+   </property>
+   <property name="shortcut">
+    <string notr="true">Ctrl+F12</string>
+   </property>
+   <property name="shortcutContext">
+    <enum>Qt::ApplicationShortcut</enum>
+   </property>
+  </action>
+  <action name="actionAboutQt">
+   <property name="text">
+    <string>关于&amp;Qt</string>
+   </property>
+  </action>
+  <action name="actionSearch">
+   <property name="text">
+    <string>查找(&amp;F)...</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+F</string>
+   </property>
+  </action>
+  <action name="actionIndex">
+   <property name="text">
+    <string>章节索引(&amp;I)...</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+I</string>
+   </property>
+  </action>
+  <action name="actionAutoRoll">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>自动滚屏(&amp;A)</string>
+   </property>
+   <property name="shortcut">
+    <string>Return</string>
+   </property>
+  </action>
+  <action name="actionShowTray">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>显示托盘(&amp;T)</string>
+   </property>
+  </action>
+  <action name="actionUTF_16BE">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>U&amp;TF-16BE</string>
+   </property>
+  </action>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>WidgetFull</class>
+   <extends>QWidget</extends>
+   <header>core/widgetfull.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>WidgetOneLine</class>
+   <extends>QWidget</extends>
+   <header>core/widgetoneline.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>actionOpen</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>actionOpenTriggered()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>307</x>
+     <y>262</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>actionOpenTriggered()</slot>
+ </slots>
+</ui>
