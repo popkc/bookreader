@@ -200,7 +200,8 @@ void MainWindow::setupFont()
     paintInfo.fontm = new QFontMetrics(paintInfo.font);
     paintInfo.background.setColor(QColor(bgr, bgg, bgb));
     paintInfo.fontcolor.setColor(QColor(fontr, fontg, fontb));
-    paintInfo.selectedColor.setColor(QColor(255 - bgr, 255 - bgg, 255 - bgb));
+    //paintInfo.selectedColor.setColor(QColor(255 - bgr, 255 - bgg, 255 - bgb));
+    paintInfo.selectedColor.setColor(QColor(bgr < 128 ? 255 : 0, bgg < 128 ? 255 : 0, bgb < 128 ? 255 : 0));
 
     paintInfo.linespace = settings->value("?app/linespace", DEFAULT_LINESPACE).toUInt();
     paintInfo.padding = settings->value("?app/padding", DEFAULT_PADDING).toUInt();
@@ -233,7 +234,7 @@ void MainWindow::setupFont()
         olPaintInfo.fontm = new QFontMetrics(olPaintInfo.font);
         olPaintInfo.background.setColor(QColor(bgr, bgg, bgb));
         olPaintInfo.fontcolor.setColor(QColor(fontr, fontg, fontb));
-        olPaintInfo.selectedColor.setColor(QColor(255 - bgr, 255 - bgg, 255 - bgb));
+        //olPaintInfo.selectedColor.setColor(QColor(255 - bgr, 255 - bgg, 255 - bgb));
 
         olPaintInfo.linespace = settings->value("?oneline/linespace", ONELINE_LINESPACE).toUInt();
         olPaintInfo.padding = settings->value("?oneline/padding", ONELINE_PADDING).toUInt();
