@@ -32,6 +32,7 @@ MainWindow::MainWindow(QWidget* parent)
 
     ui->setupUi(this);
 
+    setWindowIcon(QIcon(":/icon.png"));
     waRollRate = new QWidgetAction(ui->menuJump);
     formRollRate = new FormRollRate();
     waRollRate->setDefaultWidget(formRollRate);
