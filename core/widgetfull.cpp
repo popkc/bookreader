@@ -508,7 +508,7 @@ void WidgetFull::textCache(int start, int count, char* cpos)
                 textsInfo.push_back(TextInfo(s[0], x, y, lastPos));
 
                 count--;
-                if (count == 0)
+                if (count <= 0)
                     break;
 
                 start++;
@@ -525,7 +525,7 @@ void WidgetFull::textCache(int start, int count, char* cpos)
                     fw = w->paintInfo.fontm->width(s[0]);
                     if (x != 0 && x + fw > cache.width()) {
                         count--;
-                        if (count == 0)
+                        if (count <= 0)
                             break;
 
                         start++;

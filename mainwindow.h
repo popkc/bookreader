@@ -62,6 +62,7 @@ public:
 
     Ui::MainWindow* ui;
 
+    QSqlDatabase db;
     PaintInfo paintInfo, olPaintInfo;
     QStringList recentFiles;
     QTextToSpeech textToSpeech;
@@ -115,6 +116,7 @@ private:
     void oneLineMode();
     void fullMode();
     void createTrayIcon();
+    void dbInit();
     //int getRollRateStep();
 
     QTimer timerSave;

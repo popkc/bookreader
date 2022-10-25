@@ -14,24 +14,24 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 #include "dialog/dialogindex.h"
-#include "ui_dialogindex.h"
-#include "mainwindow.h"
-#include "dialogindexadvance.h"
 #include "core/widgetoutput.h"
+#include "dialogindexadvance.h"
+#include "mainwindow.h"
+#include "ui_dialogindex.h"
 
-DialogIndex::DialogIndex(QWidget *parent) :
-    QDialog(parent),
-    ui(new Ui::DialogIndex),
-    running(false)
+DialogIndex::DialogIndex(QWidget* parent)
+    : QDialog(parent)
+    , running(false)
+    , ui(new Ui::DialogIndex)
 {
-    dialogIndexAdvance=nullptr;
+    dialogIndexAdvance = nullptr;
     ui->setupUi(this);
 
     setupRegexps();
 
-	ui->tableWidget->horizontalHeader()->setStretchLastSection(true);
-	//connect(this, &DialogIndex::indexFound, this, &DialogIndex::onIndexFound, Qt::QueuedConnection);
-	//connect(this, &DialogIndex::process, this, &DialogIndex::onProcess, Qt::QueuedConnection);
+    ui->tableWidget->horizontalHeader()->setStretchLastSection(true);
+    //connect(this, &DialogIndex::indexFound, this, &DialogIndex::onIndexFound, Qt::QueuedConnection);
+    //connect(this, &DialogIndex::process, this, &DialogIndex::onProcess, Qt::QueuedConnection);
 }
 
 DialogIndex::~DialogIndex()
@@ -41,116 +41,172 @@ DialogIndex::~DialogIndex()
 
 void DialogIndex::setupRegexps()
 {
-    QStringList sl=w->settings->value("?app/indexregexps", DEFAULT_REGEXPS).toStringList();
+    QStringList sl = w->settings->value("?app/indexregexps", DEFAULT_REGEXPS).toStringList();
     regexps.resize(sl.size());
-    for(int i=0; i<sl.size(); i++) {
+    for (int i = 0; i < sl.size(); i++) {
         regexps[i].setPattern(sl[i]);
     }
-    maxWord=w->settings->value("?app/indexmaxword", DEFAULT_MAXWORD).toInt();
+    maxWord = w->settings->value("?app/indexmaxword", DEFAULT_MAXWORD).toInt();
 }
 
 void DialogIndex::workIndex()
 {
     int maxByte;
-    if(w->fileInfo.codec->name()=="UTF-8")
-        maxByte=maxWord*3;
+    if (w->fileInfo.codec->name() == "UTF-8")
+        maxByte = maxWord * 3;
     else
-        maxByte=maxWord*2;
+        maxByte = maxWord * 2;
 
-    char *p=w->fileInfo.content+startPos;
-    char *np;
-    lastPiece=(w->fileInfo.contentEnd-w->fileInfo.content+1)/PIECESIZE;
+    char* p = w->fileInfo.content + startPos;
+    char* np;
+    lastPiece = (w->fileInfo.contentEnd - w->fileInfo.content + 1) / PIECESIZE;
     QTextDecoder td(w->fileInfo.codec, QTextCodec::IgnoreHeader);
-    if(w->fileInfo.codec->name().startsWith("UTF-16")) {
-        utf16=true;
+    if (w->fileInfo.codec->name().startsWith("UTF-16")) {
+        utf16 = true;
         QTextEncoder te(w->fileInfo.codec, QTextCodec::IgnoreHeader);
-        utf16n=te.fromUnicode("\n");
+        utf16n = te.fromUnicode("\n");
     }
     else
-        utf16=false;
+        utf16 = false;
 
-    if(startPos!=0) {
-        piece=startPos/PIECESIZE;
-        p=findNextN(p);
-        if(!p)
+    if (startPos != 0) {
+        piece = startPos / PIECESIZE;
+        p = findNextN(p);
+        if (!p)
             goto end;
         p++;
     }
     else
-        piece=0;
+        piece = 0;
 
-    while((np=findNextN(p))) {
-        if(np!=p && np-p <= maxByte) {
+    while ((np = findNextN(p))) {
+        if (np != p && np - p <= maxByte) {
             QString s;
-            if(utf16)
-                s=td.toUnicode(p, np - p -1);
+            if (utf16)
+                s = td.toUnicode(p, np - p - 1);
             else
-                s=td.toUnicode(p, np-p);
+                s = td.toUnicode(p, np - p);
 
             s.remove('\r');
-            for(const QRegExp &r : regexps) {
-                if(r.indexIn(s)!=-1) {
+            for (const QRegExp& r : regexps) {
+                if (r.indexIn(s) != -1) {
                     emit indexFound(p, s);
                     break;
                 }
             }
         }
-        p=np+1;
+        p = np + 1;
     }
 end:;
-	emit process(100);
+    emit process(100);
     finishedCount--;
 }
 
 void DialogIndex::workLoad()
 {
-    int piece=startPos/PIECESIZE;
-    int lastPiece=(w->fileInfo.contentEnd - w->fileInfo.content - 1)/PIECESIZE;
+    int piece = startPos / PIECESIZE;
+    int lastPiece = (w->fileInfo.contentEnd - w->fileInfo.content - 1) / PIECESIZE;
     do {
         w->fileInfo.loadPiece(piece);
         piece++;
-    } while(piece<=lastPiece && running);
+    } while (piece <= lastPiece && running);
     this->finishedCount--;
 }
 
 void DialogIndex::init()
 {
-	ui->tableWidget->clearContents();
-	auto sl = w->settings->value(w->fileInfo.file.fileName() + "/?indexpos").toStringList();
-	auto sl2 = w->settings->value(w->fileInfo.file.fileName() + "/?indexstring").toStringList();
-	int cou = sl.size();
-	ui->tableWidget->setRowCount(cou);
-	QTableWidgetItem *wi;
-	for (int i = 0; i < cou; i++) {
-		wi = new QTableWidgetItem(sl[i]);
-		ui->tableWidget->setItem(i, 0, wi);
-		if (i < sl2.size()) {
-			wi = new QTableWidgetItem(sl2[i]);
-			ui->tableWidget->setItem(i, 1, wi);
-		}
-	}
-	changed = false;
+    /*ui->tableWidget->clearContents();
+    auto sl = w->settings->value(w->fileInfo.file.fileName() + "/?indexpos").toStringList();
+    auto sl2 = w->settings->value(w->fileInfo.file.fileName() + "/?indexstring").toStringList();
+    int cou = sl.size();
+    ui->tableWidget->setRowCount(cou);
+    QTableWidgetItem* wi;
+    for (int i = 0; i < cou; i++) {
+        wi = new QTableWidgetItem(sl[i]);
+        ui->tableWidget->setItem(i, 0, wi);
+        if (i < sl2.size()) {
+            wi = new QTableWidgetItem(sl2[i]);
+            ui->tableWidget->setItem(i, 1, wi);
+        }
+    }
+    changed = false;
+    selectCurrentPos();*/
+
+    if (w->db.isOpen()) {
+        ui->tableWidget->clearContents();
+        QSqlQuery gfid;
+        gfid.prepare("SELECT ROWID FROM 'files' WHERE file = ?");
+        gfid.bindValue(0, w->fileInfo.file.fileName());
+        gfid.exec();
+        if (!gfid.isActive())
+            qDebug() << gfid.lastError();
+        if (gfid.next()) {
+            fileId = gfid.value(0).toInt();
+        }
+        else {
+            QSqlQuery ifile;
+            ifile.prepare("INSERT INTO 'files' (file) VALUES (?)");
+            ifile.bindValue(0, w->fileInfo.file.fileName());
+            if (!ifile.exec()) {
+                qDebug() << ifile.lastError().text();
+            }
+            fileId = ifile.lastInsertId().toInt();
+        }
+        QSqlQuery gi;
+        gi.prepare("SELECT pos,string FROM 'index' WHERE file = ?");
+        gi.bindValue(0, fileId);
+        gi.exec();
+        int tc = 0;
+        while (gi.next()) {
+            if (ui->tableWidget->rowCount() <= tc)
+                ui->tableWidget->setRowCount(tc + 1);
+            auto wi = new QTableWidgetItem(gi.value(0).toString());
+            ui->tableWidget->setItem(tc, 0, wi);
+            wi = new QTableWidgetItem(gi.value(1).toString());
+            ui->tableWidget->setItem(tc, 1, wi);
+            tc++;
+        }
+    }
+    changed = false;
     selectCurrentPos();
 }
 
 void DialogIndex::save()
 {
-	if (changed) {
-		int cou = ui->tableWidget->rowCount();
-		QStringList sl1, sl2;
-		for (int i = 0; i < cou; i++) {
-			sl1 << ui->tableWidget->item(i, 0)->text();
-			sl2 << ui->tableWidget->item(i, 1)->text();
-		}
-		w->settings->setValue(w->fileInfo.file.fileName() + "/?indexpos", sl1);
-		w->settings->setValue(w->fileInfo.file.fileName() + "/?indexstring", sl2);
-	}
+    if (w->db.isOpen() && changed) {
+        /*int cou = ui->tableWidget->rowCount();
+        QStringList sl1, sl2;
+        for (int i = 0; i < cou; i++) {
+            sl1 << ui->tableWidget->item(i, 0)->text();
+            sl2 << ui->tableWidget->item(i, 1)->text();
+        }
+        w->settings->setValue(w->fileInfo.file.fileName() + "/?indexpos", sl1);
+        w->settings->setValue(w->fileInfo.file.fileName() + "/?indexstring", sl2);*/
+
+        w->db.transaction();
+        QSqlQuery sqdl;
+        sqdl.prepare("DELETE FROM 'index' WHERE file = ?");
+        sqdl.bindValue(0, fileId);
+        sqdl.exec();
+        int c = ui->tableWidget->rowCount();
+        QSqlQuery sqi;
+        sqi.prepare("INSERT INTO 'index' (file,pos,string) VALUES (?,?,?)");
+        sqi.bindValue(0, fileId);
+        for (int i = 0; i < c; i++) {
+            sqi.bindValue(1, ui->tableWidget->item(i, 0)->text());
+            sqi.bindValue(2, ui->tableWidget->item(i, 1)->text());
+            sqi.exec();
+        }
+        sqdl.finish();
+        sqi.finish();
+        w->db.commit();
+    }
 }
 
 void DialogIndex::on_pushButtonAdvance_clicked()
 {
-    if(!dialogIndexAdvance) {
-        dialogIndexAdvance=new DialogIndexAdvance(this);
+    if (!dialogIndexAdvance) {
+        dialogIndexAdvance = new DialogIndexAdvance(this);
     }
     dialogIndexAdvance->init();
     dialogIndexAdvance->exec();
@@ -158,131 +214,131 @@ void DialogIndex::on_pushButtonAdvance_clicked()
 
 void DialogIndex::on_pushButtonCreateIndex_clicked()
 {
-    if(!running) {
-        if(regexps.isEmpty()) {
+    if (!running) {
+        if (regexps.isEmpty()) {
             QMessageBox::warning(this, tr("错误"), tr("没有有效的正则表达式。"));
             return;
         }
 
-		if (ui->tableWidget->rowCount() > 1) {
-			int r = QMessageBox::question(this, tr("提示"),
-				tr("目前已经有索引存在，请问是否要清空？\n"
-					"选Yes，则清空现有索引，再重新建立索引。\n"
-					"选No，则保留现有索引，并在现有索引的最后处继续建立索引。\n"
-					"选Cancel，则不进行任何操作。"),
-				QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel);
-			if (r == QMessageBox::Yes) {
-				startPos = 0;
-				ui->tableWidget->clearContents();
-				ui->tableWidget->setRowCount(0);
-			}
-			else if (r == QMessageBox::No) {
-				startPos = ui->tableWidget->item(ui->tableWidget->rowCount() - 1, 0)->text().toUInt();
-			}
-			else
-				return;
-		}
-		else
-			startPos = 0;
+        if (ui->tableWidget->rowCount() > 1) {
+            int r = QMessageBox::question(this, tr("提示"),
+                tr("目前已经有索引存在，请问是否要清空？\n"
+                   "选Yes，则清空现有索引，再重新建立索引。\n"
+                   "选No，则保留现有索引，并在现有索引的最后处继续建立索引。\n"
+                   "选Cancel，则不进行任何操作。"),
+                QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel);
+            if (r == QMessageBox::Yes) {
+                startPos = 0;
+                ui->tableWidget->clearContents();
+                ui->tableWidget->setRowCount(0);
+            }
+            else if (r == QMessageBox::No) {
+                startPos = ui->tableWidget->item(ui->tableWidget->rowCount() - 1, 0)->text().toUInt();
+            }
+            else
+                return;
+        }
+        else
+            startPos = 0;
 
-		changed = true;
+        changed = true;
 
         ui->pushButtonClear->setEnabled(false);
         ui->pushButtonDel->setEnabled(false);
         ui->pushButtonAdvance->setEnabled(false);
         ui->pushButtonCreateIndex->setText(tr("停止"));
-        running=true;
-        finishedCount=2;
+        running = true;
+        finishedCount = 2;
         connect(this, &DialogIndex::indexFound, this, &DialogIndex::onIndexFound, Qt::QueuedConnection);
         connect(this, &DialogIndex::process, this, &DialogIndex::onProcess, Qt::QueuedConnection);
-        threadIndex=std::thread(&DialogIndex::workIndex, this);
-        threadLoad=std::thread(&DialogIndex::workLoad, this);
+        threadIndex = std::thread(&DialogIndex::workIndex, this);
+        threadLoad = std::thread(&DialogIndex::workLoad, this);
         threadLoad.detach();
         threadIndex.detach();
     }
     else {
         discon();
-		ui->progressBarIndex->setValue(0);
+        ui->progressBarIndex->setValue(0);
 
-        while(finishedCount>0) {
+        while (finishedCount > 0) {
             QThread::usleep(10);
         }
     }
 }
 
-void DialogIndex::onIndexFound(char *pos, QString s)
+void DialogIndex::onIndexFound(char* pos, QString s)
 {
-	if (!running)
-		return;
+    if (!running)
+        return;
 
-    QString n=QString::number(pos - w->fileInfo.content);
-    int row=ui->tableWidget->rowCount();
-    ui->tableWidget->setRowCount(row+1);
-    QTableWidgetItem *twi=new QTableWidgetItem(n);
-    ui->tableWidget->setItem(row, 0 ,twi);
-    twi=new QTableWidgetItem(s);
-    ui->tableWidget->setItem(row, 1 ,twi);
+    QString n = QString::number(pos - w->fileInfo.content);
+    int row = ui->tableWidget->rowCount();
+    ui->tableWidget->setRowCount(row + 1);
+    QTableWidgetItem* twi = new QTableWidgetItem(n);
+    ui->tableWidget->setItem(row, 0, twi);
+    twi = new QTableWidgetItem(s);
+    ui->tableWidget->setItem(row, 1, twi);
 }
 
 void DialogIndex::onProcess(int value)
 {
-	if (!running)
-		return;
+    if (!running)
+        return;
 
-    if(value<100)
+    if (value < 100)
         ui->progressBarIndex->setValue(value);
     else {
         discon();
         ui->progressBarIndex->setValue(100);
         QMessageBox::about(this, tr("提示"), tr("索引建立完毕！"));
         ui->progressBarIndex->setValue(0);
-        while(finishedCount>0) {
+        while (finishedCount > 0) {
             QThread::usleep(10);
         }
     }
 }
 
-char *DialogIndex::findNextN(char *pos)
+char* DialogIndex::findNextN(char* pos)
 {
-    if(pos>=w->fileInfo.contentEnd)
+    if (pos >= w->fileInfo.contentEnd)
         return nullptr;
 
-    for(;;) {
-        while(!w->fileInfo.pieceLoaded[piece]) {
+    for (;;) {
+        while (!w->fileInfo.pieceLoaded[piece]) {
             QThread::usleep(10);
         }
 
-        if(piece<lastPiece) {
-			quint32 mp = (piece + 1)*PIECESIZE;
-            if(utf16) {
-                int dis=pos - w->fileInfo.content;
-                while((pos=(char*)memchr(pos, utf16n[1], mp - dis))) {
-                    if((dis & 1) == 1) {
-                        if(*(pos-1) == utf16n[0])
+        if (piece < lastPiece) {
+            quint32 mp = (piece + 1) * PIECESIZE;
+            if (utf16) {
+                int dis = pos - w->fileInfo.content;
+                while ((pos = (char*)memchr(pos, utf16n[1], mp - dis))) {
+                    if ((dis & 1) == 1) {
+                        if (*(pos - 1) == utf16n[0])
                             return pos;
                     }
                     pos++;
-                    dis=pos - w->fileInfo.content;
+                    dis = pos - w->fileInfo.content;
                 }
             }
             else {
-                pos=(char*)memchr(pos, '\n', mp - (pos - w->fileInfo.content));
-                if(pos)
+                pos = (char*)memchr(pos, '\n', mp - (pos - w->fileInfo.content));
+                if (pos)
                     return pos;
             }
 
-            if(!running)
+            if (!running)
                 return nullptr;
 
-            pos=w->fileInfo.content+mp;
-			piece++;
-			emit process((pos - w->fileInfo.content - startPos) * 100 / (w->fileInfo.file.size() - startPos));
+            pos = w->fileInfo.content + mp;
+            piece++;
+            emit process((pos - w->fileInfo.content - startPos) * 100 / (w->fileInfo.file.size() - startPos));
         }
         else {
-            if(utf16) {
-                while((pos=(char*)memchr(pos, utf16n[1], w->fileInfo.contentEnd - pos))) {
-                    if(((pos - w->fileInfo.content) & 1) == 1) {
-                        if(*(pos-1) == utf16n[0])
+            if (utf16) {
+                while ((pos = (char*)memchr(pos, utf16n[1], w->fileInfo.contentEnd - pos))) {
+                    if (((pos - w->fileInfo.content) & 1) == 1) {
+                        if (*(pos - 1) == utf16n[0])
                             return pos;
                     }
                     pos++;
@@ -298,7 +354,7 @@ char *DialogIndex::findNextN(char *pos)
 
 void DialogIndex::discon()
 {
-    running=false;
+    running = false;
     disconnect(this, &DialogIndex::indexFound, 0, 0);
     disconnect(this, &DialogIndex::process, 0, 0);
     ui->pushButtonClear->setEnabled(true);
@@ -309,20 +365,20 @@ void DialogIndex::discon()
 
 void DialogIndex::selectCurrentPos()
 {
-    int c=ui->tableWidget->rowCount();
-    if(c==0)
+    int c = ui->tableWidget->rowCount();
+    if (c == 0)
         return;
     int i;
-    for(i=0; i<c; i++) {
-        if(w->fileInfo.currentPos < ui->tableWidget->item(i, 0)->text().toUInt()) {
-            if(i>0)
+    for (i = 0; i < c; i++) {
+        if (w->fileInfo.currentPos < ui->tableWidget->item(i, 0)->text().toUInt()) {
+            if (i > 0)
                 i--;
             break;
         }
     }
-    if(i==c)
-		i--;
-	ui->tableWidget->selectRow(0);
+    if (i == c)
+        i--;
+    ui->tableWidget->selectRow(0);
     ui->tableWidget->selectRow(i);
     ui->tableWidget->setFocus();
 }
@@ -330,44 +386,44 @@ void DialogIndex::selectCurrentPos()
 void DialogIndex::on_pushButtonClear_clicked()
 {
     ui->tableWidget->clearContents();
-	ui->tableWidget->setRowCount(0);
-	changed = true;
+    ui->tableWidget->setRowCount(0);
+    changed = true;
 }
 
 void DialogIndex::on_pushButtonDel_clicked()
 {
-    auto ilist=ui->tableWidget->selectedItems();
-    if(ilist.isEmpty()) {
+    auto ilist = ui->tableWidget->selectedItems();
+    if (ilist.isEmpty()) {
         QMessageBox::warning(this, tr("错误"), tr("请选择要删除的条目。"));
         return;
     }
-	changed = true;
+    changed = true;
     std::set<int> si;
-    for(auto wi : ilist) {
+    for (auto wi : ilist) {
         si.insert(wi->row());
     }
-    auto it=si.end();
-    if(it!=si.begin()) {
-		do {
-			it--;
-			ui->tableWidget->removeRow(*it);
-		} while (it != si.begin());
+    auto it = si.end();
+    if (it != si.begin()) {
+        do {
+            it--;
+            ui->tableWidget->removeRow(*it);
+        } while (it != si.begin());
     }
 }
 
-void DialogIndex::on_tableWidget_cellDoubleClicked(int row, int )
+void DialogIndex::on_tableWidget_cellDoubleClicked(int row, int)
 {
-    quint32 cp=ui->tableWidget->item(row, 0)->text().toUInt();
-    if(cp >= w->fileInfo.file.size()) {
+    quint32 cp = ui->tableWidget->item(row, 0)->text().toUInt();
+    if (cp >= w->fileInfo.file.size()) {
         QMessageBox::warning(this, tr("错误"), tr("索引位置超过了文件大小，请重新建立索引！"));
         return;
     }
-	w->currentOutput->changeCurrentPos(cp);
+    w->currentOutput->changeCurrentPos(cp);
 }
 
 void DialogIndex::on_pushButtonCurrentPos_clicked()
 {
-    if(ui->tableWidget->rowCount()==0) {
+    if (ui->tableWidget->rowCount() == 0) {
         QMessageBox::warning(this, tr("错误"), tr("没有有效的索引。"));
         return;
     }

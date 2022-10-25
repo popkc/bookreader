@@ -55,6 +55,21 @@ MainWindow::~MainWindow()
 void MainWindow::init()
 {
     settings = new QSettings("./" + QApplication::applicationName() + ".ini", QSettings::IniFormat, this);
+    db = QSqlDatabase::addDatabase("QSQLITE");
+    db.setDatabaseName("./" + QApplication::applicationName() + ".sqlite");
+    if (db.open()) {
+        db.exec("CREATE TABLE IF NOT EXISTS 'files' ("
+                "'file'	TEXT NOT NULL UNIQUE,"
+                "PRIMARY KEY('file')"
+                ")");
+        db.exec("CREATE TABLE IF NOT EXISTS 'index' ("
+                "'file'	INTEGER NOT NULL,"
+                "'pos'	INTEGER NOT NULL,"
+                "'string'	TEXT NOT NULL,"
+                "PRIMARY KEY('file','pos')"
+                ") WITHOUT ROWID");
+    }
+
     ui->widgetOneLine->init();
     ui->actionShowTray->setChecked(settings->value("?app/showtray", true).toBool());
 
@@ -537,6 +552,9 @@ void MainWindow::on_actionIndex_triggered()
 {
     if (!dialogIndex) {
         dialogIndex = new DialogIndex(this);
+        if (!w->db.isOpen()) {
+            QMessageBox::warning(this, "错误", "sqlite数据库打开失败，无法保存和读取章节索引。");
+        }
     }
     dialogIndex->init();
     dialogIndex->exec();

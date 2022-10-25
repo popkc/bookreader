@@ -102,6 +102,8 @@ void WidgetOutput::changeCurrentPos(quint32 pos)
     prevLine = nullptr;
     prevPage = nullptr;
     update();
+
+    w->ui->verticalScrollBar->setValue(pos);
 }
 
 bool WidgetOutput::isEndChar(QChar& c)

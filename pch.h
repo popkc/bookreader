@@ -36,6 +36,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #endif
 
 #include <QtGui>
+#include <QtSql>
 #include <QtWidgets>
 
 /*
