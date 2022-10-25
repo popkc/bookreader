@@ -25,7 +25,8 @@ class DialogIndex;
 class DialogIndexAdvance;
 
 #define DEFAULT_REGEXPS (QStringList() << tr("(^|[\\s　])(正文|作品相关|前传|后传|外传|引子|锲子)([\\s　]|$)") << tr("(^|[\\s　纪传])第?((\\d+)|[两零一二三四五六七八九壹贰叁肆伍陆柒捌玖十百千万拾佰仟〇]+|序)([篇章节集卷部\\s　\\.\\-—]|$)") << tr("(^|[\\s　])[篇章节卷部集]\\s*((\\d)|[两零一二三四五六七八九壹贰叁肆伍陆柒捌玖十百千万拾佰仟〇])") << tr("(纪|传)([\\s\\(（　]|$)"))
-#define DEFAULT_MAXWORD 30
+#define DEFAULT_MAXWORD 50
+#define DEFAULT_QUZA true
 
 class DialogIndex : public QDialog
 {
@@ -39,22 +40,22 @@ public:
     void workLoad();
     void init();
     void save();
-    QVector<QRegExp> regexps;
+    QVector<QRegularExpression> regexps, regexps2;
     DialogIndexAdvance* dialogIndexAdvance;
     int maxWord;
-    std::thread threadIndex, threadLoad;
+    //std::thread threadIndex, threadLoad;
     std::atomic_bool running;
     quint32 startPos;
     std::atomic<int> finishedCount;
 signals:
-    void indexFound(char* pos, QString s);
+    void indexFound(char* pos, const QString& s, const QStringList& mlist);
     void process(int value);
 private slots:
     void on_pushButtonAdvance_clicked();
 
     void on_pushButtonCreateIndex_clicked();
 
-    void onIndexFound(char* pos, QString s);
+    void onIndexFound(char* pos, const QString& s, const QStringList& mlist);
     void onProcess(int value);
     void on_pushButtonClear_clicked();
 
@@ -66,15 +67,19 @@ private slots:
 
 private:
     Ui::DialogIndex* ui;
+    std::map<QStringList, int> mapMlist;
+    QList<QStringList> mlistlist;
     int fileId;
     bool utf16;
     int lastPiece;
     int piece;
     QByteArray utf16n;
     bool changed;
+    int isContinue;
     char* findNextN(char* pos);
     void discon();
     void selectCurrentPos();
+    void testMlist(const QStringList& mlist);
 };
 
 #endif // DIALOGINDEX_H

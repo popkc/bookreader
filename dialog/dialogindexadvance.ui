@@ -49,6 +49,13 @@
     </layout>
    </item>
    <item>
+    <widget class="QCheckBox" name="checkBoxQuZa">
+     <property name="text">
+      <string>筛除掉与大部分索引格式不同的索引</string>
+     </property>
+    </widget>
+   </item>
+   <item>
     <widget class="QGroupBox" name="groupBox">
      <property name="title">
       <string>正则表达式</string>

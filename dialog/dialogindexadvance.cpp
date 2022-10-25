@@ -14,13 +14,13 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 #include "dialog/dialogindexadvance.h"
-#include "ui_dialogindexadvance.h"
-#include "mainwindow.h"
 #include "dialogindex.h"
+#include "mainwindow.h"
+#include "ui_dialogindexadvance.h"
 
-DialogIndexAdvance::DialogIndexAdvance(QWidget *parent) :
-    QDialog(parent),
-    ui(new Ui::DialogIndexAdvance)
+DialogIndexAdvance::DialogIndexAdvance(QWidget* parent)
+    : QDialog(parent)
+    , ui(new Ui::DialogIndexAdvance)
 {
     ui->setupUi(this);
 }
@@ -33,27 +33,28 @@ DialogIndexAdvance::~DialogIndexAdvance()
 void DialogIndexAdvance::init()
 {
     ui->listWidgetIndex->clear();
-    QStringList sl=w->settings->value("?app/indexregexps", DEFAULT_REGEXPS).toStringList();
+    QStringList sl = w->settings->value("?app/indexregexps", DEFAULT_REGEXPS).toStringList();
     ui->listWidgetIndex->addItems(sl);
     ui->spinBoxMaxWord->setValue(w->settings->value("?app/indexmaxword", DEFAULT_MAXWORD).toInt());
+    ui->checkBoxQuZa->setChecked(w->settings->value("?app/quza", DEFAULT_QUZA).toBool());
 }
 
 void DialogIndexAdvance::on_pushButtonAdd_clicked()
 {
     bool ok;
-    QString s=QInputDialog::getText(this, tr("添加"), tr("请输入要添加的正则表达式"), QLineEdit::Normal, QString(), &ok);
-    if(ok) {
+    QString s = QInputDialog::getText(this, tr("添加"), tr("请输入要添加的正则表达式"), QLineEdit::Normal, QString(), &ok);
+    if (ok) {
         ui->listWidgetIndex->addItem(s);
     }
 }
 
 void DialogIndexAdvance::on_pushButtonModify_clicked()
 {
-    auto item=ui->listWidgetIndex->currentItem();
-    if(item) {
+    auto item = ui->listWidgetIndex->currentItem();
+    if (item) {
         bool ok;
-        QString s=QInputDialog::getText(this, tr("修改"), QString(), QLineEdit::Normal, item->text(), &ok);
-        if(ok) {
+        QString s = QInputDialog::getText(this, tr("修改"), QString(), QLineEdit::Normal, item->text(), &ok);
+        if (ok) {
             item->setText(s);
         }
     }
@@ -64,8 +65,8 @@ void DialogIndexAdvance::on_pushButtonModify_clicked()
 
 void DialogIndexAdvance::on_pushButtonDel_clicked()
 {
-    auto item=ui->listWidgetIndex->currentItem();
-    if(item)
+    auto item = ui->listWidgetIndex->currentItem();
+    if (item)
         delete item;
     else
         QMessageBox::warning(this, tr("错误"), tr("请选择要删除的条目。"));
@@ -85,9 +86,9 @@ void DialogIndexAdvance::on_pushButtonCancel_clicked()
 
 void DialogIndexAdvance::on_pushButtonOk_clicked()
 {
-    int c=ui->listWidgetIndex->count();
+    int c = ui->listWidgetIndex->count();
     QStringList sl;
-    for(int i=0; i<c; i++) {
+    for (int i = 0; i < c; i++) {
         sl << ui->listWidgetIndex->item(i)->text();
     }
     w->settings->setValue("?app/indexregexps", sl);
@@ -98,15 +99,15 @@ void DialogIndexAdvance::on_pushButtonOk_clicked()
 
 void DialogIndexAdvance::on_pushButtonTest_clicked()
 {
-    int c=ui->listWidgetIndex->count();
+    int c = ui->listWidgetIndex->count();
     QVector<QRegExp> re(c);
-    for(int i=0; i<c; i++) {
+    for (int i = 0; i < c; i++) {
         re[i].setPattern(ui->listWidgetIndex->item(i)->text());
     }
 
-    QString s=ui->lineEditTest->text();
-    for(const QRegExp & r : re) {
-        if(r.indexIn(s)!=-1) {
+    QString s = ui->lineEditTest->text();
+    for (const QRegExp& r : re) {
+        if (r.indexIn(s) != -1) {
             QMessageBox::about(this, tr("提示"), tr("匹配成功！"));
             return;
         }

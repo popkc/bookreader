@@ -46,6 +46,7 @@ void DialogIndex::setupRegexps()
     for (int i = 0; i < sl.size(); i++) {
         regexps[i].setPattern(sl[i]);
     }
+    regexps2 = regexps;
     maxWord = w->settings->value("?app/indexmaxword", DEFAULT_MAXWORD).toInt();
 }
 
@@ -88,9 +89,10 @@ void DialogIndex::workIndex()
                 s = td.toUnicode(p, np - p);
 
             s.remove('\r');
-            for (const QRegExp& r : regexps) {
-                if (r.indexIn(s) != -1) {
-                    emit indexFound(p, s);
+            for (const auto& r : regexps) {
+                auto ma = r.match(s);
+                if (ma.hasMatch()) {
+                    emit indexFound(p, s, ma.capturedTexts());
                     break;
                 }
             }
@@ -220,6 +222,8 @@ void DialogIndex::on_pushButtonCreateIndex_clicked()
             return;
         }
 
+        isContinue = 0;
+
         if (ui->tableWidget->rowCount() > 1) {
             int r = QMessageBox::question(this, tr("提示"),
                 tr("目前已经有索引存在，请问是否要清空？\n"
@@ -234,6 +238,7 @@ void DialogIndex::on_pushButtonCreateIndex_clicked()
             }
             else if (r == QMessageBox::No) {
                 startPos = ui->tableWidget->item(ui->tableWidget->rowCount() - 1, 0)->text().toUInt();
+                isContinue = ui->tableWidget->rowCount();
             }
             else
                 return;
@@ -241,6 +246,8 @@ void DialogIndex::on_pushButtonCreateIndex_clicked()
         else
             startPos = 0;
 
+        mapMlist.clear();
+        mlistlist.clear();
         changed = true;
 
         ui->pushButtonClear->setEnabled(false);
@@ -251,10 +258,21 @@ void DialogIndex::on_pushButtonCreateIndex_clicked()
         finishedCount = 2;
         connect(this, &DialogIndex::indexFound, this, &DialogIndex::onIndexFound, Qt::QueuedConnection);
         connect(this, &DialogIndex::process, this, &DialogIndex::onProcess, Qt::QueuedConnection);
-        threadIndex = std::thread(&DialogIndex::workIndex, this);
-        threadLoad = std::thread(&DialogIndex::workLoad, this);
-        threadLoad.detach();
-        threadIndex.detach();
+        std::thread(&DialogIndex::workIndex, this).detach();
+        std::thread(&DialogIndex::workLoad, this).detach();
+
+        if (isContinue) {
+            for (int i = 0; i < ui->tableWidget->rowCount(); i++) {
+                auto s = ui->tableWidget->item(i, 1)->text();
+                for (auto& r : regexps2) {
+                    auto ma = r.match(s);
+                    if (ma.hasMatch()) {
+                        testMlist(ma.capturedTexts());
+                        break;
+                    }
+                }
+            }
+        }
     }
     else {
         discon();
@@ -266,7 +284,32 @@ void DialogIndex::on_pushButtonCreateIndex_clicked()
     }
 }
 
-void DialogIndex::onIndexFound(char* pos, QString s)
+void DialogIndex::testMlist(const QStringList& mlist)
+{
+    bool found = false;
+    for (auto& p : mapMlist) {
+        if (p.first.size() == mlist.size()) {
+            int count = 0;
+            for (int i = 0; i < mlist.size(); i++) {
+                if (p.first[i] == mlist[i])
+                    count++;
+            }
+
+            if (count >= mlist.size() - 2) {
+                found = true;
+                p.second++;
+                break;
+            }
+        }
+    }
+
+    if (!found) {
+        mapMlist[mlist] = 1;
+    }
+    mlistlist.push_back(mlist);
+}
+
+void DialogIndex::onIndexFound(char* pos, const QString& s, const QStringList& mlist)
 {
     if (!running)
         return;
@@ -278,6 +321,8 @@ void DialogIndex::onIndexFound(char* pos, QString s)
     ui->tableWidget->setItem(row, 0, twi);
     twi = new QTableWidgetItem(s);
     ui->tableWidget->setItem(row, 1, twi);
+
+    testMlist(mlist);
 }
 
 void DialogIndex::onProcess(int value)
@@ -290,6 +335,39 @@ void DialogIndex::onProcess(int value)
     else {
         discon();
         ui->progressBarIndex->setValue(100);
+
+        std::pair<const QStringList, int>* pp = nullptr;
+        for (auto& p : mapMlist) {
+            if (!pp)
+                pp = &p;
+            else {
+                if (pp->second < p.second)
+                    pp = &p;
+            }
+        }
+
+        if (pp && w->settings->value("?app/quza", DEFAULT_QUZA).toBool()) {
+            const auto& ml = pp->first;
+            for (int i = 0; i < mlistlist.size();) {
+                if (mlistlist[i].size() != ml.size()) {
+                    i++;
+                    continue;
+                }
+                int c = 0;
+                for (int j = 0; j < ml.size(); j++) {
+                    if (mlistlist[i][j] == ml[j])
+                        c++;
+                }
+
+                if (c < ml.size() - 2) {
+                    mlistlist.removeAt(i);
+                    ui->tableWidget->removeRow(i);
+                    continue;
+                }
+                i++;
+            }
+        }
+
         QMessageBox::about(this, tr("提示"), tr("索引建立完毕！"));
         ui->progressBarIndex->setValue(0);
         while (finishedCount > 0) {
