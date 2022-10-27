@@ -504,6 +504,8 @@ void WidgetFull::textCache(int start, int count, char* cpos)
             if (s == "\n") {
                 if (w->paintInfo.smartReturn && !isEndChar(lastChar))
                     continue;
+                if (x == 0)
+                    continue;
                 lastChar = s[0];
                 textsInfo.push_back(TextInfo(s[0], x, y, lastPos));
 

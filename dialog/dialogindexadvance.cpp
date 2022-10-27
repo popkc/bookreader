@@ -100,14 +100,14 @@ void DialogIndexAdvance::on_pushButtonOk_clicked()
 void DialogIndexAdvance::on_pushButtonTest_clicked()
 {
     int c = ui->listWidgetIndex->count();
-    QVector<QRegExp> re(c);
+    QVector<QRegularExpression> re(c);
     for (int i = 0; i < c; i++) {
         re[i].setPattern(ui->listWidgetIndex->item(i)->text());
     }
 
     QString s = ui->lineEditTest->text();
-    for (const QRegExp& r : re) {
-        if (r.indexIn(s) != -1) {
+    for (const auto& r : re) {
+        if (r.match(s).hasMatch()) {
             QMessageBox::about(this, tr("提示"), tr("匹配成功！"));
             return;
         }

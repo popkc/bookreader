@@ -155,7 +155,7 @@ void DialogIndex::init()
             fileId = ifile.lastInsertId().toInt();
         }
         QSqlQuery gi;
-        gi.prepare("SELECT pos,string FROM 'index' WHERE file = ?");
+        gi.prepare("SELECT pos,string FROM 'index' WHERE file = ? ORDER BY pos ASC");
         gi.bindValue(0, fileId);
         gi.exec();
         int tc = 0;
