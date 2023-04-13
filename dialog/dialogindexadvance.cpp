@@ -93,6 +93,7 @@ void DialogIndexAdvance::on_pushButtonOk_clicked()
     }
     w->settings->setValue("?app/indexregexps", sl);
     w->settings->setValue("?app/indexmaxword", ui->spinBoxMaxWord->value());
+    w->settings->setValue("?app/quza", ui->checkBoxQuZa->isChecked());
     static_cast<DialogIndex*>(parent())->setupRegexps();
     this->accept();
 }
