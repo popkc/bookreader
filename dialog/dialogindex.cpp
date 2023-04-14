@@ -30,8 +30,8 @@ DialogIndex::DialogIndex(QWidget* parent)
     setupRegexps();
 
     ui->tableWidget->horizontalHeader()->setStretchLastSection(true);
-    //connect(this, &DialogIndex::indexFound, this, &DialogIndex::onIndexFound, Qt::QueuedConnection);
-    //connect(this, &DialogIndex::process, this, &DialogIndex::onProcess, Qt::QueuedConnection);
+    // connect(this, &DialogIndex::indexFound, this, &DialogIndex::onIndexFound, Qt::QueuedConnection);
+    // connect(this, &DialogIndex::process, this, &DialogIndex::onProcess, Qt::QueuedConnection);
 }
 
 DialogIndex::~DialogIndex()
@@ -295,7 +295,7 @@ void DialogIndex::testMlist(const QStringList& mlist)
                     count++;
             }
 
-            if (count >= mlist.size() - 2) {
+            if (count >= 2) {
                 found = true;
                 p.second++;
                 break;
@@ -349,22 +349,20 @@ void DialogIndex::onProcess(int value)
         if (pp && w->settings->value("?app/quza", DEFAULT_QUZA).toBool()) {
             const auto& ml = pp->first;
             for (int i = 0; i < mlistlist.size();) {
-                if (mlistlist[i].size() != ml.size()) {
-                    i++;
-                    continue;
-                }
-                int c = 0;
-                for (int j = 0; j < ml.size(); j++) {
-                    if (mlistlist[i][j] == ml[j])
-                        c++;
-                }
+                if (mlistlist[i].size() == ml.size()) {
+                    int c = 0;
+                    for (int j = 0; j < ml.size(); j++) {
+                        if (mlistlist[i][j] == ml[j])
+                            c++;
+                    }
 
-                if (c < ml.size() - 2) {
-                    mlistlist.removeAt(i);
-                    ui->tableWidget->removeRow(i);
-                    continue;
+                    if (c >= 2) {
+                        i++;
+                        continue;
+                    }
                 }
-                i++;
+                mlistlist.removeAt(i);
+                ui->tableWidget->removeRow(i);
             }
         }
 
