@@ -112,12 +112,14 @@ private slots:
 
     void on_actionShowTray_triggered(bool checked);
 
+    void on_actionCodecAutoDetect_triggered();
+
 private:
     void oneLineMode();
     void fullMode();
     void createTrayIcon();
     void dbInit();
-    //int getRollRateStep();
+    // int getRollRateStep();
 
     QTimer timerSave;
     QTimer timerRoll;

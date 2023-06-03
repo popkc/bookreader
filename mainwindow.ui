@@ -83,7 +83,7 @@
      <addaction name="actionMoveNext"/>
      <addaction name="actionMovePrev"/>
     </widget>
-    <addaction name="actionGBK"/>
+    <addaction name="actionGB18030"/>
     <addaction name="actionBig5"/>
     <addaction name="actionUTF_8"/>
     <addaction name="actionUTF_16"/>
@@ -91,6 +91,7 @@
     <addaction name="actionShift_JIS"/>
     <addaction name="actionEUC_KR"/>
     <addaction name="separator"/>
+    <addaction name="actionCodecAutoDetect"/>
     <addaction name="menuLmcl"/>
    </widget>
    <widget class="QMenu" name="menuConfig">
@@ -149,12 +150,12 @@
     <string>退出(&amp;X)</string>
    </property>
   </action>
-  <action name="actionGBK">
+  <action name="actionGB18030">
    <property name="checkable">
     <bool>true</bool>
    </property>
    <property name="text">
-    <string notr="true">&amp;GBK</string>
+    <string notr="true">&amp;GB18030</string>
    </property>
   </action>
   <action name="actionBig5">
@@ -301,6 +302,11 @@
    </property>
    <property name="text">
     <string>U&amp;TF-16BE</string>
+   </property>
+  </action>
+  <action name="actionCodecAutoDetect">
+   <property name="text">
+    <string>自动检测</string>
    </property>
   </action>
  </widget>

@@ -99,7 +99,7 @@ void MainWindow::init()
             }
         }
     }
-    codecTriggered(ui->actionGBK);
+    codecTriggered(ui->actionGB18030);
 acfound:;
 
     recentFiles = settings->value("?app/recentfiles").toStringList();
@@ -216,7 +216,7 @@ void MainWindow::setupFont()
     paintInfo.fontm = new QFontMetrics(paintInfo.font);
     paintInfo.background.setColor(QColor(bgr, bgg, bgb));
     paintInfo.fontcolor.setColor(QColor(fontr, fontg, fontb));
-    //paintInfo.selectedColor.setColor(QColor(255 - bgr, 255 - bgg, 255 - bgb));
+    // paintInfo.selectedColor.setColor(QColor(255 - bgr, 255 - bgg, 255 - bgb));
     paintInfo.selectedColor.setColor(QColor(bgr < 128 ? 255 : 0, bgg < 128 ? 255 : 0, bgb < 128 ? 255 : 0));
 
     paintInfo.linespace = settings->value("?app/linespace", DEFAULT_LINESPACE).toUInt();
@@ -250,7 +250,7 @@ void MainWindow::setupFont()
         olPaintInfo.fontm = new QFontMetrics(olPaintInfo.font);
         olPaintInfo.background.setColor(QColor(bgr, bgg, bgb));
         olPaintInfo.fontcolor.setColor(QColor(fontr, fontg, fontb));
-        //olPaintInfo.selectedColor.setColor(QColor(255 - bgr, 255 - bgg, 255 - bgb));
+        // olPaintInfo.selectedColor.setColor(QColor(255 - bgr, 255 - bgg, 255 - bgb));
 
         olPaintInfo.linespace = settings->value("?oneline/linespace", ONELINE_LINESPACE).toUInt();
         olPaintInfo.padding = settings->value("?oneline/padding", ONELINE_PADDING).toUInt();
@@ -310,7 +310,7 @@ void MainWindow::codecTriggered(QAction* ac)
     }
     ac->setChecked(true);
     fileInfo.codec = QTextCodec::codecForName(ac->iconText().toLocal8Bit());
-    //assert(fileInfo.codec);
+    // assert(fileInfo.codec);
     if (fileInfo.file.isOpen()) {
         settings->setValue(fileInfo.file.fileName() + "/?codec", fileInfo.codec->name());
         currentOutput->needRedraw = true;
@@ -350,7 +350,7 @@ void MainWindow::handleHotKeyRead()
 
 void MainWindow::onTimerRoll()
 {
-    //qDebug(QString::number(remainRollTime).toUtf8());
+    // qDebug(QString::number(remainRollTime).toUtf8());
     lldiv_t dt = ::lldiv(etRoll.restart() * rollRate + remainRollTime, 500);
     remainRollTime = dt.rem;
     if (dt.quot > 0)
@@ -597,5 +597,12 @@ void MainWindow::on_actionShowTray_triggered(bool checked)
     else {
         trayIcon->hide();
         settings->setValue("?app/showtray", false);
+    }
+}
+
+void MainWindow::on_actionCodecAutoDetect_triggered()
+{
+    if (fileInfo.file.isOpen()) {
+        fileInfo.detectCodec();
     }
 }

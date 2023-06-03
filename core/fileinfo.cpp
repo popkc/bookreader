@@ -175,7 +175,7 @@ void FileInfo::detectCodec()
     }
 
     if (codec->name() == "UTF-8" || codec->name().startsWith("UTF-16"))
-        w->codecTriggered(w->ui->actionGBK);
+        w->codecTriggered(w->ui->actionGB18030);
 }
 
 void FileInfo::checkCurrentPiece()
@@ -201,7 +201,7 @@ void FileInfo::saveReadPos()
 void FileInfo::startReading()
 {
     w->ui->menuCodec->setEnabled(false);
-    //w->ui->verticalScrollBar->setEnabled(false);
+    // w->ui->verticalScrollBar->setEnabled(false);
     nextSentencePos = content + currentPos;
     connect(&w->textToSpeech, &QTextToSpeech::stateChanged, this, &FileInfo::handleStateChanged);
     prepareSentence();
@@ -210,7 +210,7 @@ void FileInfo::startReading()
 void FileInfo::stopReading()
 {
     w->ui->menuCodec->setEnabled(true);
-    //w->ui->verticalScrollBar->setEnabled(true);
+    // w->ui->verticalScrollBar->setEnabled(true);
     disconnect(&w->textToSpeech, 0, 0, 0);
     w->textToSpeech.stop();
 }
