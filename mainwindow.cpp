@@ -21,10 +21,12 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include "dialog/formrollrate.h"
 #include "ui_mainwindow.h"
 
-MainWindow::MainWindow(QWidget* parent)
+MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
+    , popupMenu(this)
 {
+    inited = false;
     dialogConfig = nullptr;
     dialogSearch = nullptr;
     dialogIndex = nullptr;
@@ -70,13 +72,28 @@ void MainWindow::init()
                 ") WITHOUT ROWID");
     }
 
-    ui->widgetOneLine->init();
+    actionCopy = new QAction(this);
+    actionCopy->setText(tr("复制(&P)"));
+    connect(actionCopy, &QAction::triggered, this, &MainWindow::onActionCopy);
+    popupMenu.addAction(actionCopy);
+    popupMenu.addSeparator();
+    popupMenu.addAction(w->ui->actionOpen);
+    popupMenu.addMenu(w->ui->menuRecentFiles);
+    popupMenu.addSeparator();
+    popupMenu.addMenu(w->ui->menuCodec);
+    popupMenu.addMenu(w->ui->menuConfig);
+    popupMenu.addMenu(w->ui->menuAutoRead);
+    popupMenu.addMenu(w->ui->menuJump);
+    popupMenu.addSeparator();
+    popupMenu.addAction(w->ui->actionExit);
+
     ui->actionShowTray->setChecked(settings->value("?app/showtray", true).toBool());
 
     if (settings->value("?app/onelinemode", false).toBool())
         oneLineMode();
-    else
+    else {
         fullMode();
+    }
 
     paintInfo.fontm = nullptr;
     paintInfo.background.setStyle(Qt::SolidPattern);
@@ -85,14 +102,14 @@ void MainWindow::init()
     setupFont();
 
     auto alist = ui->menuCodec->actions();
-    for (QAction* ac : alist) {
+    for (QAction *ac : alist) {
         if (ac->isCheckable()) {
             connect(ac, SIGNAL(triggered(bool)), this, SLOT(actionCodecTriggered()));
         }
     }
     QByteArray ba = settings->value("?app/codec").toByteArray();
     if (!ba.isEmpty()) {
-        for (QAction* ac : alist) {
+        for (QAction *ac : alist) {
             if (ac->isCheckable() && ac->text().toLocal8Bit() == ba) {
                 codecTriggered(ac);
                 goto acfound;
@@ -127,6 +144,7 @@ void MainWindow::init2()
         connect(hotKeyRead, &QHotkey::activated, this, &MainWindow::handleHotKeyRead);
     else
         QMessageBox::warning(this, tr("错误"), tr("注册热键Ctrl+F12失败。"));
+    inited = true;
 }
 
 void MainWindow::oneLineMode()
@@ -142,6 +160,7 @@ void MainWindow::oneLineMode()
     currentOutput->offset = 0;
     ui->actionOneLineMode->setChecked(true);
     ui->actionFullMode->setChecked(false);
+    ui->menuDisplay->setEnabled(false);
     this->setWindowFlags(Qt::FramelessWindowHint | Qt::Tool | Qt::WindowStaysOnTopHint);
 
     if (ui->actionShowTray->isChecked()) {
@@ -158,15 +177,23 @@ void MainWindow::fullMode()
     ui->widgetFull->setVisible(true);
     ui->verticalScrollBar->setVisible(true);
     ui->actionShowTray->setEnabled(false);
-    this->menuBar()->setVisible(true);
     isOneLine = false;
     currentOutput->needRedraw = true;
     currentOutput->offset = 0;
     ui->actionOneLineMode->setChecked(false);
     ui->actionFullMode->setChecked(true);
-    this->setWindowFlags(Qt::Window);
+    ui->menuDisplay->setEnabled(true);
     if (trayIcon)
         trayIcon->hide();
+
+    if (settings->value("?app/display", DEFAULT_DISPLAY).toInt() == 0) {
+        ui->actionWindowed->setChecked(false);
+        ui->actionWindowed->trigger();
+    }
+    else {
+        ui->actionNoBorder->setChecked(false);
+        ui->actionNoBorder->trigger();
+    }
 }
 
 void MainWindow::createTrayIcon()
@@ -257,7 +284,7 @@ void MainWindow::setupFont()
     }
 
     if (isOneLine)
-        static_cast<WidgetOneLine*>(currentOutput)->adjustHeight();
+        static_cast<WidgetOneLine *>(currentOutput)->adjustHeight();
     currentOutput->changeCacheSize();
 }
 
@@ -267,7 +294,7 @@ void MainWindow::setupVoice()
     QString s = settings->value("?voice/voice").toString();
     QVoice voice;
     if (!s.isEmpty()) {
-        for (const QVoice& v : vlist) {
+        for (const QVoice &v : vlist) {
             if (v.name() == s) {
                 voice = v;
                 goto voiceFound;
@@ -293,18 +320,18 @@ void MainWindow::resetRecentFiles()
         a->deleteLater();
     }
 
-    for (const QString& s : recentFiles) {
-        QAction* ac = new QAction(ui->menuRecentFiles);
+    for (const QString &s : recentFiles) {
+        QAction *ac = new QAction(ui->menuRecentFiles);
         ac->setText(s);
         ui->menuRecentFiles->addAction(ac);
         connect(ac, SIGNAL(triggered(bool)), this, SLOT(onActionRecentFiles()));
     }
 }
 
-void MainWindow::codecTriggered(QAction* ac)
+void MainWindow::codecTriggered(QAction *ac)
 {
     auto alist = ui->menuCodec->actions();
-    for (QAction* a : alist) {
+    for (QAction *a : alist) {
         if (a->isCheckable())
             a->setChecked(false);
     }
@@ -334,7 +361,7 @@ void MainWindow::actionOpenTriggered()
 
 void MainWindow::actionCodecTriggered()
 {
-    QAction* ac = static_cast<QAction*>(sender());
+    QAction *ac = static_cast<QAction *>(sender());
     if (ac->isChecked()) {
         codecTriggered(ac);
         settings->setValue("?app/codec", ac->text().toLocal8Bit());
@@ -357,7 +384,7 @@ void MainWindow::onTimerRoll()
         currentOutput->addOffset(dt.quot);
 }
 
-void MainWindow::closeEvent(QCloseEvent*)
+void MainWindow::closeEvent(QCloseEvent *)
 {
     fileInfo.saveReadPos();
     settings->setValue("?app/rollrate", rollRate);
@@ -407,7 +434,7 @@ void MainWindow::onTimerSave()
 
 void MainWindow::onActionRecentFiles()
 {
-    QAction* ac = static_cast<QAction*>(sender());
+    QAction *ac = static_cast<QAction *>(sender());
     w->fileInfo.close();
     w->fileInfo.loadFile(ac->text());
 }
@@ -421,7 +448,7 @@ void MainWindow::onTrayActivated(QSystemTrayIcon::ActivationReason reason)
 
 void MainWindow::onActionShow()
 {
-    WidgetOneLine* wol = static_cast<WidgetOneLine*>(currentOutput);
+    WidgetOneLine *wol = static_cast<WidgetOneLine *>(currentOutput);
     wol->adjustPos();
     if (wol->hidding)
         wol->endHide();
@@ -449,7 +476,7 @@ void MainWindow::on_actionMovePrev_triggered()
     }
 }
 
-void MainWindow::keyPressEvent(QKeyEvent* event)
+void MainWindow::keyPressEvent(QKeyEvent *event)
 {
     if (fileInfo.file.isOpen()) {
         if (event->key() == Qt::Key_Enter || event->key() == Qt::Key_Return) {
@@ -564,9 +591,7 @@ void MainWindow::on_actionIndex_triggered()
 void MainWindow::on_actionFullMode_triggered(bool checked)
 {
     if (checked) {
-        currentOutput->saveState();
         fullMode();
-        currentOutput->restoreState();
         settings->setValue("?app/onelinemode", false);
     }
     else
@@ -579,7 +604,7 @@ void MainWindow::on_actionOneLineMode_triggered(bool checked)
         currentOutput->saveState();
         oneLineMode();
         currentOutput->restoreState();
-        static_cast<WidgetOneLine*>(currentOutput)->adjustHeight();
+        static_cast<WidgetOneLine *>(currentOutput)->adjustHeight();
         settings->setValue("?app/onelinemode", true);
     }
     else
@@ -604,5 +629,76 @@ void MainWindow::on_actionCodecAutoDetect_triggered()
 {
     if (fileInfo.file.isOpen()) {
         fileInfo.detectCodec();
+    }
+}
+
+void MainWindow::onActionCopy()
+{
+    if (w->fileInfo.file.isOpen()) {
+        QString s;
+        for (const auto &ti : textsInfo) {
+            s += ti.c;
+        }
+        QApplication::clipboard()->setText(s);
+    }
+    else
+        QApplication::clipboard()->setText(WELCOMETEXT);
+}
+
+bool MainWindow::clearDisplayActions(QAction *ac)
+{
+    bool ic = ac->isChecked();
+    for (auto a : ui->menuDisplay->actions()) {
+        if (a->isCheckable())
+            a->setChecked(false);
+    }
+    ac->setChecked(true);
+    return ic;
+}
+
+void MainWindow::myMaximized()
+{
+    if (inited) {
+        this->showMaximized();
+    }
+}
+
+void MainWindow::on_actionFullScreen_triggered()
+{
+    bool ic = clearDisplayActions(ui->actionFullScreen);
+    if (ic) {
+        menuBar()->hide();
+        ui->verticalScrollBar->hide();
+        this->showFullScreen();
+    }
+    else {
+        if (settings->value("?app/display", DEFAULT_DISPLAY).toInt() == 0)
+            ui->actionWindowed->trigger();
+        else
+            ui->actionNoBorder->trigger();
+    }
+}
+
+void MainWindow::on_actionNoBorder_triggered()
+{
+    bool ic = clearDisplayActions(ui->actionNoBorder);
+    if (ic) {
+        settings->setValue("?app/display", 1);
+        this->setWindowFlags(Qt::FramelessWindowHint | Qt::Window);
+        menuBar()->hide();
+        ui->verticalScrollBar->hide();
+        myMaximized();
+    }
+}
+
+void MainWindow::on_actionWindowed_triggered()
+{
+    bool ic = clearDisplayActions(ui->actionWindowed);
+    if (ic) {
+        settings->setValue("?app/display", 0);
+        setWindowFlags(Qt::Window);
+        menuBar()->setVisible(true);
+        ui->verticalScrollBar->setVisible(true);
+        myMaximized();
     }
 }

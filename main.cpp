@@ -13,10 +13,10 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
+#include "core/widgetoneline.h"
+#include "core/widgetoutput.h"
 #include "mainwindow.h"
 #include <QApplication>
-#include "core/widgetoutput.h"
-#include "core/widgetoneline.h"
 
 MainWindow *w;
 
@@ -26,13 +26,15 @@ int main(int argc, char *argv[])
     QTranslator tl;
     tl.load("qt_zh_CN.qm");
     a.installTranslator(&tl);
-    w=new MainWindow;
+    w = new MainWindow;
     w->init();
-	w->currentOutput->restoreState();
-	if(w->isOneLine)
-		static_cast<WidgetOneLine*>(w->currentOutput)->adjustHeight();
-    w->currentOutput->changeCacheSize();
-	w->init2();
+    if (w->isOneLine) {
+        static_cast<WidgetOneLine *>(w->currentOutput)->adjustHeight();
+        w->currentOutput->restoreState();
+    }
+    else
+        w->showMaximized();
+    w->init2();
 
-    return a.exec();;
+    return a.exec();
 }

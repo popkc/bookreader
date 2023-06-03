@@ -20,7 +20,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include "pch.h"
 #include "ui_mainwindow.h"
 
-FileInfo::FileInfo(QObject* parent)
+FileInfo::FileInfo(QObject *parent)
     : QObject(parent)
 {
     content = nullptr;
@@ -36,7 +36,7 @@ FileInfo::~FileInfo()
         delete[] pieceLoaded;
 }
 
-void FileInfo::loadFile(const QString& fn)
+void FileInfo::loadFile(const QString &fn)
 {
     file.setFileName(fn);
     if (!file.open(QFile::ReadOnly)) {
@@ -127,7 +127,7 @@ void FileInfo::close()
     w->setWindowTitle(POPKC_TITLE);
     w->ui->menuJump->setEnabled(false);
     w->ui->menuAutoRead->setEnabled(false);
-    w->currentOutput->textsInfo.clear();
+    w->textsInfo.clear();
 }
 
 void FileInfo::loadPiece(quint32 piece)
@@ -153,7 +153,7 @@ void FileInfo::detectCodec()
 {
     file.seek(0);
     auto ba = file.read(3);
-    QTextCodec* ncodec = QTextCodec::codecForUtfText(ba, nullptr);
+    QTextCodec *ncodec = QTextCodec::codecForUtfText(ba, nullptr);
     if (ncodec) {
         if (ncodec->name().contains("UTF-8")) {
             w->codecTriggered(w->ui->actionUTF_8);
@@ -219,27 +219,27 @@ void FileInfo::prepareSentence()
 {
     QString s;
     for (;;) {
-        if (nextSentencePos >= contentEnd || w->currentOutput->textsInfo.empty()) {
+        if (nextSentencePos >= contentEnd || w->textsInfo.empty()) {
             QMessageBox::about(w, tr("提示"), tr("朗读完毕！"));
             w->ui->actionRead->setChecked(false);
             return;
         }
-        auto it = w->currentOutput->textsInfo.begin();
-        while (it != w->currentOutput->textsInfo.end()) {
+        auto it = w->textsInfo.begin();
+        while (it != w->textsInfo.end()) {
             if (it->contentPos >= nextSentencePos) {
                 break;
             }
             it++;
         }
 
-        while (it != w->currentOutput->textsInfo.end()) {
+        while (it != w->textsInfo.end()) {
             if (w->stopWord.contains(it->c)) {
                 if (!s.isEmpty()) {
                     do {
                         it++;
-                    } while (it != w->currentOutput->textsInfo.end() && w->stopWord.contains(it->c));
+                    } while (it != w->textsInfo.end() && w->stopWord.contains(it->c));
 
-                    if (it != w->currentOutput->textsInfo.end())
+                    if (it != w->textsInfo.end())
                         nextSentencePos = it->contentPos;
                     else
                         nextSentencePos = WidgetOutput::getNextPos((--it)->contentPos);
@@ -253,7 +253,7 @@ void FileInfo::prepareSentence()
             it++;
         }
 
-        nextSentencePos = WidgetOutput::getNextPos((w->currentOutput->textsInfo.end() - 1)->contentPos);
+        nextSentencePos = WidgetOutput::getNextPos((w->textsInfo.end() - 1)->contentPos);
         w->currentOutput->pageMoveDown();
         if (!s.isEmpty()) {
             w->textToSpeech.say(s);
@@ -262,7 +262,7 @@ void FileInfo::prepareSentence()
     }
 }
 
-char* FileInfo::findLastParaStart(char* cpos)
+char *FileInfo::findLastParaStart(char *cpos)
 {
     quint32 piece = (cpos - content) / PIECESIZE;
     if (piece >= 1)
@@ -283,7 +283,7 @@ char* FileInfo::findLastParaStart(char* cpos)
         QByteArray ba = te.fromUnicode(QString("\n"));
         QByteArray bar = te.fromUnicode(QString("\r"));
         for (;;) {
-            char* p = myMemrchr(dis, cpos, ba[1]);
+            char *p = myMemrchr(dis, cpos, ba[1]);
             if (!p) {
                 if (nearStart)
                     return content;
@@ -308,7 +308,7 @@ char* FileInfo::findLastParaStart(char* cpos)
     }
     else {
         for (;;) {
-            char* p = myMemrchr(dis, cpos, '\n');
+            char *p = myMemrchr(dis, cpos, '\n');
             if (p) {
                 if (cpos - p <= 1 || (cpos - p == 2 && p[1] == '\r')) {
                     dis -= cpos - p;
@@ -349,8 +349,8 @@ int FileInfo::utf8Detect()
         return 0;
 
     loadPiece(0);
-    unsigned char* start = reinterpret_cast<unsigned char*>(content);
-    unsigned char* end;
+    unsigned char *start = reinterpret_cast<unsigned char *>(content);
+    unsigned char *end;
     if (file.size() < PIECESIZE)
         end = start + file.size();
     else
@@ -401,10 +401,10 @@ void FileInfo::moveToNsp()
         w->currentOutput->update();
     }
     else {
-        auto it = w->currentOutput->textsInfo.begin();
+        auto it = w->textsInfo.begin();
         int y = it->screenPos.y();
         int lc = 0;
-        while (it != w->currentOutput->textsInfo.end()) {
+        while (it != w->textsInfo.end()) {
             if (it->screenPos.y() != y) {
                 lc++;
                 y = it->screenPos.y();
@@ -419,7 +419,7 @@ void FileInfo::moveToNsp()
             it++;
         }
 
-        if (it == w->currentOutput->textsInfo.end()) {
+        if (it == w->textsInfo.end()) {
             w->currentOutput->pageMoveDown();
         }
     }
@@ -427,7 +427,7 @@ void FileInfo::moveToNsp()
 }
 
 //算法来自于glibc里的memrchr函数
-char* myMemrchr(int len, char* memEnd, char c)
+char *myMemrchr(int len, char *memEnd, char c)
 {
     uintptr_t l = sizeof(uintptr_t) - 1;
     uintptr_t lc, tl;
@@ -447,35 +447,35 @@ char* myMemrchr(int len, char* memEnd, char c)
         l = ((uintptr_t)0x7efefefe << 32) | 0xfefefeff;
     }
 
-    uintptr_t* pl = reinterpret_cast<uintptr_t*>(memEnd);
+    uintptr_t *pl = reinterpret_cast<uintptr_t *>(memEnd);
     while (len >= (int)sizeof(uintptr_t)) {
         pl--;
         tl = *pl ^ lc;
         if ((((tl + l) ^ ~tl) & ~l) != 0) {
             if (sizeof(uintptr_t) == 8) {
-                if (reinterpret_cast<char*>(pl)[7] == c)
-                    return reinterpret_cast<char*>(pl) + 7;
-                if (reinterpret_cast<char*>(pl)[6] == c)
-                    return reinterpret_cast<char*>(pl) + 6;
-                if (reinterpret_cast<char*>(pl)[5] == c)
-                    return reinterpret_cast<char*>(pl) + 5;
-                if (reinterpret_cast<char*>(pl)[4] == c)
-                    return reinterpret_cast<char*>(pl) + 4;
+                if (reinterpret_cast<char *>(pl)[7] == c)
+                    return reinterpret_cast<char *>(pl) + 7;
+                if (reinterpret_cast<char *>(pl)[6] == c)
+                    return reinterpret_cast<char *>(pl) + 6;
+                if (reinterpret_cast<char *>(pl)[5] == c)
+                    return reinterpret_cast<char *>(pl) + 5;
+                if (reinterpret_cast<char *>(pl)[4] == c)
+                    return reinterpret_cast<char *>(pl) + 4;
             }
-            if (reinterpret_cast<char*>(pl)[3] == c)
-                return reinterpret_cast<char*>(pl) + 3;
-            if (reinterpret_cast<char*>(pl)[2] == c)
-                return reinterpret_cast<char*>(pl) + 2;
-            if (reinterpret_cast<char*>(pl)[1] == c)
-                return reinterpret_cast<char*>(pl) + 1;
-            if (*reinterpret_cast<char*>(pl) == c)
-                return reinterpret_cast<char*>(pl);
+            if (reinterpret_cast<char *>(pl)[3] == c)
+                return reinterpret_cast<char *>(pl) + 3;
+            if (reinterpret_cast<char *>(pl)[2] == c)
+                return reinterpret_cast<char *>(pl) + 2;
+            if (reinterpret_cast<char *>(pl)[1] == c)
+                return reinterpret_cast<char *>(pl) + 1;
+            if (*reinterpret_cast<char *>(pl) == c)
+                return reinterpret_cast<char *>(pl);
         }
 
         len -= sizeof(uintptr_t);
     }
 
-    memEnd = reinterpret_cast<char*>(pl);
+    memEnd = reinterpret_cast<char *>(pl);
     while (len > 0) {
         memEnd--;
         if (*memEnd == c)

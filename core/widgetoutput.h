@@ -17,29 +17,14 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #include "pch.h"
 
-#define WELCOMETEXT QObject::tr("欢迎使用POPKC阅读软件！")
-
-struct TextInfo
-{
-    TextInfo(const QChar& c, int x, int y, char* cpos)
-        : c(c)
-        , screenPos(x, y)
-        , contentPos(cpos)
-    {
-    }
-    QChar c;
-    QPoint screenPos;
-    char* contentPos;
-};
-
 class WidgetOutput : public QWidget
 {
     Q_OBJECT
 
 public:
-    WidgetOutput(QWidget* parent);
+    WidgetOutput(QWidget *parent);
     ~WidgetOutput();
-    static char* getNextPos(char* cpos);
+    static char *getNextPos(char *cpos);
     virtual void changeCacheSize() = 0;
 
     virtual void lineMoveDown() = 0;
@@ -52,20 +37,20 @@ public:
     void saveState();
     void restoreState();
     void changeCurrentPos(quint32 pos);
-    bool isEndChar(QChar& c);
+    bool isEndChar(QChar &c);
+    void init();
 
-    char* prevPage;
-    char* prevLine;
+    char *prevPage;
+    char *prevLine;
     bool needRedraw;
-    QList<TextInfo> textsInfo;
     int offset;
 
 protected:
-    void resizeEvent(QResizeEvent* event);
-    void wheelEvent(QWheelEvent* event);
+    void resizeEvent(QResizeEvent *event);
+    void wheelEvent(QWheelEvent *event);
 
-    //char *cpos;
-    //int left,top,x,y;
+    // char *cpos;
+    // int left,top,x,y;
     QPixmap cache;
     int cacheStartPos;
     QPainter painter;

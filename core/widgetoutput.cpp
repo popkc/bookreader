@@ -19,7 +19,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include "pch.h"
 #include "ui_mainwindow.h"
 
-WidgetOutput::WidgetOutput(QWidget* parent)
+WidgetOutput::WidgetOutput(QWidget *parent)
     : QWidget(parent)
 {
     needRedraw = false;
@@ -31,12 +31,12 @@ WidgetOutput::~WidgetOutput()
 {
 }
 
-void WidgetOutput::resizeEvent(QResizeEvent*)
+void WidgetOutput::resizeEvent(QResizeEvent *)
 {
     changeCacheSize();
 }
 
-void WidgetOutput::wheelEvent(QWheelEvent* event)
+void WidgetOutput::wheelEvent(QWheelEvent *event)
 {
     if (w->ui->actionRead->isChecked() || !w->fileInfo.file.isOpen())
         return;
@@ -62,7 +62,7 @@ void WidgetOutput::wheelEvent(QWheelEvent* event)
     w->ui->verticalScrollBar->setValue(w->fileInfo.currentPos);
 }
 
-char* WidgetOutput::getNextPos(char* cpos)
+char *WidgetOutput::getNextPos(char *cpos)
 {
     QTextDecoder decoder(w->fileInfo.codec, QTextCodec::IgnoreHeader);
     for (;;) {
@@ -75,24 +75,15 @@ char* WidgetOutput::getNextPos(char* cpos)
 
 void WidgetOutput::saveState()
 {
-    if (w->isOneLine)
-        w->settings->setValue("?oneline/geometry", w->saveGeometry());
-    else
-        w->settings->setValue("?fullmode/geometry", w->saveGeometry());
+    w->settings->setValue("?oneline/geometry", w->saveGeometry());
 }
 
 void WidgetOutput::restoreState()
 {
-    if (w->isOneLine) {
-        w->showNormal();
-        w->restoreGeometry(w->settings->value("?oneline/geometry").toByteArray());
-        if (w->width() < 10)
-            w->resize(10, w->height());
-    }
-    else {
-        w->showMaximized();
-        w->restoreGeometry(w->settings->value("?fullmode/geometry").toByteArray());
-    }
+    w->showNormal();
+    w->restoreGeometry(w->settings->value("?oneline/geometry").toByteArray());
+    if (w->width() < 10)
+        w->resize(10, w->height());
 }
 
 void WidgetOutput::changeCurrentPos(quint32 pos)
@@ -106,7 +97,7 @@ void WidgetOutput::changeCurrentPos(quint32 pos)
     w->ui->verticalScrollBar->setValue(pos);
 }
 
-bool WidgetOutput::isEndChar(QChar& c)
+bool WidgetOutput::isEndChar(QChar &c)
 {
     switch (c.unicode()) {
     case L'.':
@@ -131,4 +122,8 @@ bool WidgetOutput::isEndChar(QChar& c)
     default:
         return false;
     }
+}
+
+void WidgetOutput::init()
+{
 }

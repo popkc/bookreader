@@ -40,10 +40,25 @@ struct PaintInfo
     QPen fontcolor;
     QBrush background;
     QPen selectedColor;
-    QFontMetrics* fontm;
+    QFontMetrics *fontm;
     quint32 linespace;
     quint32 padding;
     bool smartReturn;
+};
+
+#define WELCOMETEXT QObject::tr("欢迎使用POPKC阅读软件！")
+
+struct TextInfo
+{
+    TextInfo(const QChar &c, int x, int y, char *cpos)
+        : c(c)
+        , screenPos(x, y)
+        , contentPos(cpos)
+    {
+    }
+    QChar c;
+    QPoint screenPos;
+    char *contentPos;
 };
 
 class MainWindow : public QMainWindow
@@ -51,16 +66,16 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    explicit MainWindow(QWidget* parent = 0);
+    explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
     void init();
     void init2();
-    void codecTriggered(QAction* ac);
+    void codecTriggered(QAction *ac);
     void resetRecentFiles();
     void setupFont();
     void setupVoice();
 
-    Ui::MainWindow* ui;
+    Ui::MainWindow *ui;
 
     QSqlDatabase db;
     PaintInfo paintInfo, olPaintInfo;
@@ -68,19 +83,23 @@ public:
     QTextToSpeech textToSpeech;
     QString stopWord;
     FileInfo fileInfo;
-    WidgetOutput* currentOutput;
-    QSettings* settings;
-    QSystemTrayIcon* trayIcon;
+    WidgetOutput *currentOutput;
+    QSettings *settings;
+    QSystemTrayIcon *trayIcon;
     int rollRate;
     bool isOneLine;
+    QList<TextInfo> textsInfo;
+    QMenu popupMenu;
+    QAction *actionCopy;
+    bool inited;
 public slots:
     void actionOpenTriggered();
     void actionCodecTriggered();
     void handleHotKeyRead();
 
 protected:
-    void closeEvent(QCloseEvent* event);
-    void keyPressEvent(QKeyEvent* event);
+    void closeEvent(QCloseEvent *event);
+    void keyPressEvent(QKeyEvent *event);
 private slots:
     void on_actionExit_triggered();
 
@@ -114,27 +133,36 @@ private slots:
 
     void on_actionCodecAutoDetect_triggered();
 
+    void on_actionFullScreen_triggered();
+
+    void on_actionNoBorder_triggered();
+
+    void on_actionWindowed_triggered();
+
 private:
     void oneLineMode();
     void fullMode();
     void createTrayIcon();
     void dbInit();
+    void onActionCopy();
+    bool clearDisplayActions(QAction *ac);
+    void myMaximized();
     // int getRollRateStep();
 
     QTimer timerSave;
     QTimer timerRoll;
     qint64 remainRollTime;
     QElapsedTimer etRoll;
-    DialogConfig* dialogConfig;
-    QHotkey* hotKeyRead;
-    DialogSearch* dialogSearch;
-    DialogIndex* dialogIndex;
-    FormRollRate* formRollRate;
-    QWidgetAction* waRollRate;
-    QMenu* trayMenu;
-    QAction* actionShow;
+    DialogConfig *dialogConfig;
+    QHotkey *hotKeyRead;
+    DialogSearch *dialogSearch;
+    DialogIndex *dialogIndex;
+    FormRollRate *formRollRate;
+    QWidgetAction *waRollRate;
+    QMenu *trayMenu;
+    QAction *actionShow;
 };
 
-extern MainWindow* w;
+extern MainWindow *w;
 
 #endif // MAINWINDOW_H

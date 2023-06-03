@@ -65,6 +65,8 @@ class DialogConfig;
 #define MIN_ROLLRATE 1
 #define MAX_ROLLRATE 150
 
+#define DEFAULT_DISPLAY 0
+
 #define POPKC_TITLE QObject::tr("POPKC阅读软件")
 
 #ifdef _WIN32
@@ -80,7 +82,7 @@ class DialogConfig : public QDialog
     Q_OBJECT
 
 public:
-    explicit DialogConfig(QWidget* parent = 0);
+    explicit DialogConfig(QWidget *parent = 0);
     ~DialogConfig();
     void init();
     void save();
@@ -113,7 +115,7 @@ private slots:
     void on_pushButtonOLBack_clicked();
 
 private:
-    Ui::DialogConfig* ui;
+    Ui::DialogConfig *ui;
 };
 
 #endif // DIALOGCONFIG_H

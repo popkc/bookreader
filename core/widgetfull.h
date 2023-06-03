@@ -19,11 +19,11 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 class WidgetFull : public WidgetOutput
 {
-	Q_OBJECT
+    Q_OBJECT
 
 public:
-	WidgetFull(QWidget *parent);
-	~WidgetFull();
+    WidgetFull(QWidget *parent);
+    ~WidgetFull();
     virtual void changeCacheSize() override;
 
     virtual void lineMoveDown() override;
@@ -34,25 +34,26 @@ public:
     virtual void renewCache() override;
     virtual void addOffset(int value) override;
     int lineCount;
-	char *selectedStart, *selectedEnd;
-protected:
-    void paintEvent(QPaintEvent *event);
-    void mouseMoveEvent(QMouseEvent *event);
-    void mousePressEvent(QMouseEvent *event);
-    void mouseReleaseEvent(QMouseEvent *event);
-	void contextMenuEvent(QContextMenuEvent *event);
+    char *selectedStart, *selectedEnd;
 
-    void textCache(int start, int count, char* cpos);
-    QList<char*> findLineStop(char* start, char* end);
-    char* fillLine(char* end);
+protected:
+    void paintEvent(QPaintEvent *event) override;
+    void mouseMoveEvent(QMouseEvent *event) override;
+    void mousePressEvent(QMouseEvent *event) override;
+    void mouseReleaseEvent(QMouseEvent *event) override;
+    void contextMenuEvent(QContextMenuEvent *event) override;
+
+    void textCache(int start, int count, char *cpos);
+    QList<char *> findLineStop(char *start, char *end);
+    char *fillLine(char *end);
     int actualLines();
     char *getContentPosFromScreen(const QPoint &p);
-	void drawSelected();
-	void prepareCachePainter();
+    void drawSelected();
+    void prepareCachePainter();
 
     QPoint pressPoint;
     bool dragging;
-	QMenu *popupMenu;
+    QMenu *popupMenu;
 private slots:
-	void onActionCopy();
+    void onActionCopy();
 };

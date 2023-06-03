@@ -18,14 +18,14 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include "pch.h"
 #include "ui_mainwindow.h"
 
-WidgetFull::WidgetFull(QWidget* parent)
+WidgetFull::WidgetFull(QWidget *parent)
     : WidgetOutput(parent)
 {
     selectedStart = nullptr;
     selectedEnd = nullptr;
     dragging = false;
 
-    QAction* ac = new QAction(this);
+    QAction *ac = new QAction(this);
     ac->setText(tr("复制"));
     connect(ac, &QAction::triggered, this, &WidgetFull::onActionCopy);
     popupMenu = new QMenu(this);
@@ -47,11 +47,11 @@ void WidgetFull::changeCacheSize()
 void WidgetFull::lineMoveDown()
 {
     offset = 0;
-    if (!textsInfo.empty()) {
-        auto it = textsInfo.begin();
+    if (!w->textsInfo.empty()) {
+        auto it = w->textsInfo.begin();
         int y = it->screenPos.y();
         it++;
-        while (it != textsInfo.end()) {
+        while (it != w->textsInfo.end()) {
             if (it->screenPos.y() != y) {
                 prevPage = nullptr;
                 prevLine = w->fileInfo.currentPos + w->fileInfo.content;
@@ -60,11 +60,11 @@ void WidgetFull::lineMoveDown()
                     renewCache();
                 }
                 else {
-                    textsInfo.erase(textsInfo.begin(), it);
+                    w->textsInfo.erase(w->textsInfo.begin(), it);
                     cacheStartPos++;
                     if (cacheStartPos == lineCount)
                         cacheStartPos = 0;
-                    char* np = getNextPos(textsInfo.back().contentPos);
+                    char *np = getNextPos(w->textsInfo.back().contentPos);
                     int nl;
                     nl = cacheStartPos + actualLines();
 
@@ -95,7 +95,7 @@ void WidgetFull::lineMoveUp()
         return;
     }
     offset = 0;
-    char* newp;
+    char *newp;
     prevPage = nullptr;
     if (prevLine) {
         newp = prevLine;
@@ -103,8 +103,8 @@ void WidgetFull::lineMoveUp()
     }
     else {
         prevLine = nullptr;
-        char* cp = w->fileInfo.content + w->fileInfo.currentPos;
-        char* p = w->fileInfo.findLastParaStart(cp);
+        char *cp = w->fileInfo.content + w->fileInfo.currentPos;
+        char *p = w->fileInfo.findLastParaStart(cp);
         if (p) {
             auto lineStop = findLineStop(p, cp);
 
@@ -135,14 +135,14 @@ void WidgetFull::lineMoveUp()
 
     int k = actualLines();
     while (k >= lineCount - 1) {
-        auto it = textsInfo.end() - 1;
-        if (it != textsInfo.begin()) {
+        auto it = w->textsInfo.end() - 1;
+        if (it != w->textsInfo.begin()) {
             int y = it->screenPos.y();
             it--;
-            while (it != textsInfo.begin()) {
+            while (it != w->textsInfo.begin()) {
                 if (it->screenPos.y() != y) {
                     it++;
-                    textsInfo.erase(it, textsInfo.end());
+                    w->textsInfo.erase(it, w->textsInfo.end());
                     break;
                 }
                 it--;
@@ -154,25 +154,25 @@ void WidgetFull::lineMoveUp()
     cacheStartPos--;
     if (cacheStartPos < 0)
         cacheStartPos += lineCount;
-    auto oti = std::move(textsInfo);
+    auto oti = std::move(w->textsInfo);
     prepareCachePainter();
     painter.fillRect(0, cacheStartPos * w->paintInfo.fontm->height(), cache.width(), w->paintInfo.fontm->height(),
         w->paintInfo.background);
 
     textCache(cacheStartPos, 1, newp);
     painter.end();
-    textsInfo.append(oti);
+    w->textsInfo.append(oti);
     update();
 }
 
 void WidgetFull::pageMoveDown()
 {
     offset = 0;
-    auto it = textsInfo.end();
-    if (it != textsInfo.begin()) {
+    auto it = w->textsInfo.end();
+    if (it != w->textsInfo.begin()) {
         it--;
         if (lineCount <= 2) {
-            char* npos = getNextPos(textsInfo.back().contentPos);
+            char *npos = getNextPos(w->textsInfo.back().contentPos);
             if (npos < w->fileInfo.contentEnd) {
                 prevLine = prevPage = w->fileInfo.content;
                 w->fileInfo.content = npos;
@@ -183,14 +183,14 @@ void WidgetFull::pageMoveDown()
         }
         else {
             int y = it->screenPos.y();
-            while (it != textsInfo.begin()) {
+            while (it != w->textsInfo.begin()) {
                 it--;
                 if (y != it->screenPos.y()) {
                     auto nit = it;
                     it++;
                     prevPage = w->fileInfo.currentPos + w->fileInfo.content;
                     int y2 = nit->screenPos.y();
-                    while (nit != textsInfo.begin()) {
+                    while (nit != w->textsInfo.begin()) {
                         nit--;
                         if (nit->screenPos.y() != y2) {
                             nit++;
@@ -199,7 +199,7 @@ void WidgetFull::pageMoveDown()
                     }
                     prevLine = nit->contentPos;
 
-                    textsInfo.erase(textsInfo.begin(), it);
+                    w->textsInfo.erase(w->textsInfo.begin(), it);
                     w->fileInfo.currentPos = it->contentPos - w->fileInfo.content;
                     if (needRedraw) {
                         renewCache();
@@ -222,7 +222,7 @@ void WidgetFull::pageMoveDown()
                             painter.fillRect(0, line * w->paintInfo.fontm->height(), cache.width(),
                                 fe * w->paintInfo.fontm->height(), w->paintInfo.background);
 
-                        char* np = getNextPos(textsInfo.back().contentPos);
+                        char *np = getNextPos(w->textsInfo.back().contentPos);
                         textCache(line, lineCount - 2, np);
                         painter.end();
                     }
@@ -245,7 +245,7 @@ void WidgetFull::pageMoveUp()
     }
     offset = 0;
 
-    char* newp;
+    char *newp;
     prevLine = nullptr;
     if (prevPage) {
         newp = prevPage;
@@ -253,7 +253,7 @@ void WidgetFull::pageMoveUp()
     }
     else {
         prevPage = nullptr;
-        char* lp = w->fileInfo.content + w->fileInfo.currentPos;
+        char *lp = w->fileInfo.content + w->fileInfo.currentPos;
         int needLine = lineCount - 2;
         if (needLine <= 0)
             needLine = 1;
@@ -314,8 +314,8 @@ void WidgetFull::randomMove(quint32 pos)
     if (piece < w->fileInfo.pieceLoadedSize - 1)
         w->fileInfo.loadPiece(piece + 1);
 
-    char* cpos = w->fileInfo.content + pos;
-    char* p = w->fileInfo.findLastParaStart(cpos + 1);
+    char *cpos = w->fileInfo.content + pos;
+    char *p = w->fileInfo.findLastParaStart(cpos + 1);
     if (p) {
         auto ls = findLineStop(p, cpos);
         if (!ls.empty()) {
@@ -330,7 +330,7 @@ void WidgetFull::randomMove(quint32 pos)
     update();
 }
 
-void WidgetFull::paintEvent(QPaintEvent* eve)
+void WidgetFull::paintEvent(QPaintEvent *eve)
 {
     /*QElapsedTimer et;
     et.start();*/
@@ -423,20 +423,20 @@ void WidgetFull::paintEvent(QPaintEvent* eve)
             break;
     }
 
-    if (selectedStart && !textsInfo.empty()) {
+    if (selectedStart && !w->textsInfo.empty()) {
         drawSelected();
     }
 
     painter.end();
-    //qDebug(QString::number(et.elapsed()).toLocal8Bit());
+    // qDebug(QString::number(et.elapsed()).toLocal8Bit());
 }
 
 void WidgetFull::renewCache()
 {
     needRedraw = false;
     cacheStartPos = 0;
-    textsInfo.clear();
-    char* cpos = w->fileInfo.content + w->fileInfo.currentPos;
+    w->textsInfo.clear();
+    char *cpos = w->fileInfo.content + w->fileInfo.currentPos;
 
     prepareCachePainter();
     painter.fillRect(cache.rect(), w->paintInfo.background);
@@ -451,7 +451,7 @@ void WidgetFull::renewCache()
 
 void WidgetFull::addOffset(int value)
 {
-    if (w->fileInfo.currentPos >= w->fileInfo.file.size() || textsInfo.isEmpty()) {
+    if (w->fileInfo.currentPos >= w->fileInfo.file.size() || w->textsInfo.isEmpty()) {
         w->ui->actionAutoRoll->setChecked(false);
         return;
     }
@@ -472,8 +472,8 @@ void WidgetFull::addOffset(int value)
         offset = dt.rem;
     }
 
-    if (!textsInfo.isEmpty() && actualLines() < lineCount) {
-        char* np = getNextPos(textsInfo.back().contentPos);
+    if (!w->textsInfo.isEmpty() && actualLines() < lineCount) {
+        char *np = getNextPos(w->textsInfo.back().contentPos);
         if (np < w->fileInfo.contentEnd) {
             int cs = cacheStartPos - 1;
             if (cs < 0)
@@ -488,13 +488,13 @@ void WidgetFull::addOffset(int value)
     update();
 }
 
-void WidgetFull::textCache(int start, int count, char* cpos)
+void WidgetFull::textCache(int start, int count, char *cpos)
 {
     QTextDecoder decoder(w->fileInfo.codec, QTextCodec::IgnoreHeader);
     int x = 0;
     start++;
     int y = start * w->paintInfo.fontm->height() - w->paintInfo.fontm->descent();
-    char* lastPos = cpos;
+    char *lastPos = cpos;
     w->fileInfo.checkCurrentPiece();
     QChar lastChar;
     while (cpos < w->fileInfo.contentEnd) {
@@ -507,7 +507,7 @@ void WidgetFull::textCache(int start, int count, char* cpos)
                 if (x == 0)
                     continue;
                 lastChar = s[0];
-                textsInfo.push_back(TextInfo(s[0], x, y, lastPos));
+                w->textsInfo.push_back(TextInfo(s[0], x, y, lastPos));
 
                 count--;
                 if (count <= 0)
@@ -542,7 +542,7 @@ void WidgetFull::textCache(int start, int count, char* cpos)
                 else
                     fw = 0;
 
-                textsInfo.push_back(TextInfo(s[0], x, y, lastPos));
+                w->textsInfo.push_back(TextInfo(s[0], x, y, lastPos));
                 x += fw;
             }
             lastPos = cpos;
@@ -550,12 +550,12 @@ void WidgetFull::textCache(int start, int count, char* cpos)
     }
 }
 
-QList<char*> WidgetFull::findLineStop(char* p, char* cp)
+QList<char *> WidgetFull::findLineStop(char *p, char *cp)
 {
     QTextDecoder decoder(w->fileInfo.codec, QTextCodec::IgnoreHeader);
-    QList<char*> lineStop;
+    QList<char *> lineStop;
     int x = 0;
-    char* lastCharStart = p;
+    char *lastCharStart = p;
     while (p < cp) {
         QString s = decoder.toUnicode(p, 1);
         p++;
@@ -577,9 +577,9 @@ QList<char*> WidgetFull::findLineStop(char* p, char* cp)
     return lineStop;
 }
 
-char* WidgetFull::fillLine(char* end)
+char *WidgetFull::fillLine(char *end)
 {
-    char* lastPos;
+    char *lastPos;
     end--;
     QByteArray ba;
     QTextDecoder decoder(w->fileInfo.codec, QTextCodec::IgnoreHeader);
@@ -595,10 +595,10 @@ char* WidgetFull::fillLine(char* end)
 
     while (end > w->fileInfo.content) {
         if (i == 1) {
-            if (*reinterpret_cast<unsigned char*>(end) < 0x80) {
+            if (*reinterpret_cast<unsigned char *>(end) < 0x80) {
                 s = decoder.toUnicode(end, 1);
             }
-            else if (*reinterpret_cast<unsigned char*>(end) >= 0xc0) {
+            else if (*reinterpret_cast<unsigned char *>(end) >= 0xc0) {
                 s = decoder.toUnicode(ba);
                 ba.clear();
             }
@@ -610,7 +610,7 @@ char* WidgetFull::fillLine(char* end)
             s = decoder.toUnicode(end, 2);
         }
         else {
-            if (*reinterpret_cast<unsigned char*>(end) < 0x80) {
+            if (*reinterpret_cast<unsigned char *>(end) < 0x80) {
                 s = decoder.toUnicode(end, 1);
             }
             else {
@@ -644,11 +644,11 @@ char* WidgetFull::fillLine(char* end)
 
 int WidgetFull::actualLines()
 {
-    if (textsInfo.empty())
+    if (w->textsInfo.empty())
         return 0;
 
-    int y1 = textsInfo.front().screenPos.y();
-    int y2 = textsInfo.back().screenPos.y();
+    int y1 = w->textsInfo.front().screenPos.y();
+    int y2 = w->textsInfo.back().screenPos.y();
     y1 = (y1 + w->paintInfo.fontm->descent()) / w->paintInfo.fontm->height();
     y2 = (y2 + w->paintInfo.fontm->descent()) / w->paintInfo.fontm->height();
     if (y2 >= y1)
@@ -657,19 +657,19 @@ int WidgetFull::actualLines()
         return lineCount - y1 + 1 + y2;
 }
 
-char* WidgetFull::getContentPosFromScreen(const QPoint& p)
+char *WidgetFull::getContentPosFromScreen(const QPoint &p)
 {
-    if (textsInfo.empty())
+    if (w->textsInfo.empty())
         return nullptr;
 
     int line = (p.y() + offset) / (w->paintInfo.fontm->height() + w->paintInfo.linespace);
     if (line < 0)
         line = 0;
-    auto it = textsInfo.begin();
+    auto it = w->textsInfo.begin();
     int y = it->screenPos.y();
     while (line > 0) {
         it++;
-        if (it == textsInfo.end())
+        if (it == w->textsInfo.end())
             break;
         if (it->screenPos.y() != y) {
             line--;
@@ -677,23 +677,23 @@ char* WidgetFull::getContentPosFromScreen(const QPoint& p)
         }
     }
 
-    if (it == textsInfo.end())
-        return textsInfo.back().contentPos;
+    if (it == w->textsInfo.end())
+        return w->textsInfo.back().contentPos;
 
     int x = p.x() - w->paintInfo.padding;
     if (x <= 0)
         return it->contentPos;
     do {
         it++;
-    } while (it != textsInfo.end() && it->screenPos.x() <= x && it->screenPos.y() == y);
+    } while (it != w->textsInfo.end() && it->screenPos.x() <= x && it->screenPos.y() == y);
     it--;
     return it->contentPos;
 }
 
 void WidgetFull::drawSelected()
 {
-    char* p;
-    char* pe;
+    char *p;
+    char *pe;
     if (selectedStart <= selectedEnd) {
         p = selectedStart;
         pe = selectedEnd;
@@ -703,9 +703,9 @@ void WidgetFull::drawSelected()
         pe = selectedStart;
     }
 
-    if (textsInfo.front().contentPos <= pe && textsInfo.back().contentPos >= p) {
+    if (w->textsInfo.front().contentPos <= pe && w->textsInfo.back().contentPos >= p) {
         int startX, startLine, endX, endLine;
-        auto it = textsInfo.begin();
+        auto it = w->textsInfo.begin();
         for (;;) {
             if (it->contentPos >= p) {
                 startX = it->screenPos.x() + w->paintInfo.padding;
@@ -718,9 +718,9 @@ void WidgetFull::drawSelected()
             it++;
         }
 
-        if (pe >= textsInfo.back().contentPos) {
+        if (pe >= w->textsInfo.back().contentPos) {
             endX = width() - 1;
-            endLine = textsInfo.back().screenPos.y();
+            endLine = w->textsInfo.back().screenPos.y();
         }
         else {
             for (;;) {
@@ -812,7 +812,7 @@ void WidgetFull::onActionCopy()
     }
 }
 
-void WidgetFull::mouseMoveEvent(QMouseEvent* event)
+void WidgetFull::mouseMoveEvent(QMouseEvent *event)
 {
     if (!(event->buttons() & Qt::LeftButton) || !w->fileInfo.file.isOpen())
         return;
@@ -825,20 +825,20 @@ void WidgetFull::mouseMoveEvent(QMouseEvent* event)
             selectedStart = getContentPosFromScreen(pressPoint);
         }
     }
-    char* p = getContentPosFromScreen(event->pos());
+    char *p = getContentPosFromScreen(event->pos());
     if (p != selectedEnd) {
         selectedEnd = p;
         update();
     }
 }
 
-void WidgetFull::mousePressEvent(QMouseEvent* event)
+void WidgetFull::mousePressEvent(QMouseEvent *event)
 {
     if (event->button() == Qt::LeftButton && w->fileInfo.file.isOpen())
         pressPoint = event->pos();
 }
 
-void WidgetFull::mouseReleaseEvent(QMouseEvent* event)
+void WidgetFull::mouseReleaseEvent(QMouseEvent *event)
 {
     if (event->button() != Qt::LeftButton || !w->fileInfo.file.isOpen())
         return;
@@ -855,10 +855,13 @@ void WidgetFull::mouseReleaseEvent(QMouseEvent* event)
     }
 }
 
-void WidgetFull::contextMenuEvent(QContextMenuEvent* event)
+void WidgetFull::contextMenuEvent(QContextMenuEvent *event)
 {
     if (selectedStart) {
         popupMenu->popup(event->globalPos());
+    }
+    else {
+        w->popupMenu.popup(event->globalPos());
     }
 }
 

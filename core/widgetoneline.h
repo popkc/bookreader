@@ -20,11 +20,11 @@ struct PaintInfo;
 
 class WidgetOneLine : public WidgetOutput
 {
-	Q_OBJECT
+    Q_OBJECT
 
 public:
-	WidgetOneLine(QWidget *parent);
-	~WidgetOneLine();
+    WidgetOneLine(QWidget *parent);
+    ~WidgetOneLine();
     virtual void changeCacheSize() override;
 
     virtual void lineMoveDown() override;
@@ -34,44 +34,41 @@ public:
     virtual void randomMove(quint32 pos) override;
     virtual void renewCache() override;
     virtual void addOffset(int value) override;
-	void adjustHeight();
-	void init();
-	void endHide();
-	void adjustPos();
+    void adjustHeight();
+    void endHide();
+    void adjustPos();
 
-	PaintInfo *pi;
-	bool hidding;
+    PaintInfo *pi;
+    bool hidding;
+
 protected:
-	void mousePressEvent(QMouseEvent *event);
-	void mouseMoveEvent(QMouseEvent *event);
-	void mouseReleaseEvent(QMouseEvent *event);
-	void paintEvent(QPaintEvent *event);
-	void contextMenuEvent(QContextMenuEvent *event);
-	void leaveEvent(QEvent *event);
-	void prepareCachePainter();
-	void textCache(int start, int length, char *cpos);
-	QString getLastWord(int codecType, char *&p);
-	int cacheAbsDistance(int start, int end);
-	void textRemain(int start, int end, int cacheStart);
+    void mousePressEvent(QMouseEvent *event) override;
+    void mouseMoveEvent(QMouseEvent *event) override;
+    void mouseReleaseEvent(QMouseEvent *event) override;
+    void paintEvent(QPaintEvent *event) override;
+    void contextMenuEvent(QContextMenuEvent *event) override;
+    void leaveEvent(QEvent *event) override;
+    void prepareCachePainter();
+    void textCache(int start, int length, char *cpos);
+    QString getLastWord(int codecType, char *&p);
+    int cacheAbsDistance(int start, int end);
+    void textRemain(int start, int end, int cacheStart);
 
-	enum {
-		PressMiddle,
-		PressRight
-	} pressState;
-	QPoint pressMousePos;
-	QRect pressRect;
-	int spaceRemain;
-	int currentSpace;
-	int cacheRealWidth;
-	QMenu popupMenu;
-	QAction *actionCopy;
-	enum {
-		HIDEPOS_NONE,
-		HIDEPOS_LEFT,
-		HIDEPOS_RIGHT,
-		HIDEPOS_TOP,
-		HIDEPOS_BOTTOM
-	} hidePos;
+    enum {
+        PressMiddle,
+        PressRight
+    } pressState;
+    QPoint pressMousePos;
+    QRect pressRect;
+    int spaceRemain;
+    int currentSpace;
+    int cacheRealWidth;
+    enum {
+        HIDEPOS_NONE,
+        HIDEPOS_LEFT,
+        HIDEPOS_RIGHT,
+        HIDEPOS_TOP,
+        HIDEPOS_BOTTOM
+    } hidePos;
 private slots:
-	void onActionCopy();
 };

@@ -18,9 +18,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include "pch.h"
 #include "ui_mainwindow.h"
 
-WidgetOneLine::WidgetOneLine(QWidget* parent)
+WidgetOneLine::WidgetOneLine(QWidget *parent)
     : WidgetOutput(parent)
-    , popupMenu(this)
 {
     setMouseTracking(true);
     currentSpace = 0;
@@ -45,20 +44,20 @@ void WidgetOneLine::lineMoveDown()
 {
     offset = 0;
     currentSpace = 0;
-    if (!textsInfo.empty()) {
+    if (!w->textsInfo.empty()) {
         prevLine = w->fileInfo.currentPos + w->fileInfo.content;
         prevPage = nullptr;
-        auto it = textsInfo.begin();
+        auto it = w->textsInfo.begin();
         int x = it->screenPos.x();
         it++;
-        while (it != textsInfo.end()) {
+        while (it != w->textsInfo.end()) {
             int ix = it->screenPos.x();
             if (ix != x) {
                 w->fileInfo.currentPos = it->contentPos - w->fileInfo.content;
                 int end = ix + width() - pi->padding * 2;
                 if (end >= cacheRealWidth)
                     end -= cacheRealWidth;
-                QPoint& sp = textsInfo.last().screenPos;
+                QPoint &sp = w->textsInfo.last().screenPos;
                 int le = sp.x();
                 if (sp.y() == -1)
                     le += pi->fontm->maxWidth() * 2;
@@ -68,7 +67,7 @@ void WidgetOneLine::lineMoveDown()
                     le -= cacheRealWidth;
 
                 cacheStartPos = ix;
-                textsInfo.erase(textsInfo.begin(), it);
+                w->textsInfo.erase(w->textsInfo.begin(), it);
                 textRemain(le, end, ix);
                 update();
                 return;
@@ -100,11 +99,11 @@ void WidgetOneLine::lineMoveUp()
     }
     else {
         prevLine = nullptr;
-        char* p = w->fileInfo.currentPos + w->fileInfo.content;
+        char *p = w->fileInfo.currentPos + w->fileInfo.content;
         int ct = w->fileInfo.getCodecType();
         QString s;
-        char* spaceStart;
-        char* lp = p;
+        char *spaceStart;
+        char *lp = p;
         int spacing = 0;
         for (;;) {
             p--;
@@ -149,7 +148,7 @@ void WidgetOneLine::lineMoveUp()
 void WidgetOneLine::pageMoveDown()
 {
     offset = 0;
-    if (textsInfo.empty()) {
+    if (w->textsInfo.empty()) {
         int rw = width() - pi->padding * 2;
         if (currentSpace >= rw) {
             currentSpace -= rw;
@@ -160,15 +159,15 @@ void WidgetOneLine::pageMoveDown()
             return;
     }
     else {
-        char* p;
-        char* pl;
+        char *p;
+        char *pl;
         if (spaceRemain) {
-            pl = textsInfo.last().contentPos;
+            pl = w->textsInfo.last().contentPos;
             p = getNextPos(pl);
         }
         else {
-            auto it = textsInfo.end() - 1;
-            if (it != textsInfo.begin()) {
+            auto it = w->textsInfo.end() - 1;
+            if (it != w->textsInfo.begin()) {
                 p = it->contentPos;
                 it--;
                 pl = it->contentPos;
@@ -208,8 +207,8 @@ void WidgetOneLine::pageMoveUp()
     else {
         int nw;
         nw = width() - pi->padding * 2;
-        if (!textsInfo.empty()) {
-            int y = textsInfo.first().screenPos.y();
+        if (!w->textsInfo.empty()) {
+            int y = w->textsInfo.first().screenPos.y();
             if (y == -1)
                 nw -= pi->fontm->maxWidth() * 2;
             else
@@ -223,10 +222,10 @@ void WidgetOneLine::pageMoveUp()
 
         QString s;
         int spacing = 0;
-        char* spaceStart;
-        QList<QPair<QChar, char*>> spaceInfos;
-        char* p = w->fileInfo.content + w->fileInfo.currentPos;
-        char* lp = p;
+        char *spaceStart;
+        QList<QPair<QChar, char *>> spaceInfos;
+        char *p = w->fileInfo.content + w->fileInfo.currentPos;
+        char *lp = p;
         for (;;) {
             p--;
             s = getLastWord(codecType, p);
@@ -242,7 +241,7 @@ void WidgetOneLine::pageMoveUp()
                             spacing = 1;
                         else {
                             spacing = 2;
-                            spaceInfos.append(QPair<QChar, char*>(s[0], p));
+                            spaceInfos.append(QPair<QChar, char *>(s[0], p));
                         }
                     }
                 }
@@ -304,7 +303,7 @@ void WidgetOneLine::renewCache()
 {
     needRedraw = false;
     cacheStartPos = 0;
-    textsInfo.clear();
+    w->textsInfo.clear();
     prepareCachePainter();
     painter.fillRect(cache.rect(), pi->background);
     if (!w->fileInfo.file.isOpen()) {
@@ -341,8 +340,8 @@ void WidgetOneLine::addOffset(int value)
 
 start:;
     if (offset) {
-        auto it = textsInfo.begin();
-        while (it != textsInfo.end()) {
+        auto it = w->textsInfo.begin();
+        while (it != w->textsInfo.end()) {
             int y = it->screenPos.y();
             if (y != 0) {
                 if (y == -1)
@@ -366,7 +365,7 @@ start:;
         }
     }
 
-    if (textsInfo.empty())
+    if (w->textsInfo.empty())
         renewCache();
     else {
         int sp = cacheStartPos + offset;
@@ -376,8 +375,8 @@ start:;
         if (end >= cacheRealWidth)
             end -= cacheRealWidth;
 
-        int y = textsInfo.last().screenPos.y();
-        int le = textsInfo.last().screenPos.x();
+        int y = w->textsInfo.last().screenPos.y();
+        int le = w->textsInfo.last().screenPos.x();
         if (y == -1)
             y = pi->fontm->maxWidth() * 2;
         le += y;
@@ -394,25 +393,7 @@ void WidgetOneLine::adjustHeight()
     w->resize(w->width(), pi->fontm->height() + pi->linespace * 2);
 }
 
-void WidgetOneLine::init()
-{
-    actionCopy = new QAction(this);
-    actionCopy->setText(tr("复制(&P)"));
-    connect(actionCopy, &QAction::triggered, this, &WidgetOneLine::onActionCopy);
-    popupMenu.addAction(actionCopy);
-    popupMenu.addSeparator();
-    popupMenu.addAction(w->ui->actionOpen);
-    popupMenu.addMenu(w->ui->menuRecentFiles);
-    popupMenu.addSeparator();
-    popupMenu.addMenu(w->ui->menuCodec);
-    popupMenu.addMenu(w->ui->menuConfig);
-    popupMenu.addMenu(w->ui->menuAutoRead);
-    popupMenu.addMenu(w->ui->menuJump);
-    popupMenu.addSeparator();
-    popupMenu.addAction(w->ui->actionExit);
-}
-
-void WidgetOneLine::mousePressEvent(QMouseEvent* event)
+void WidgetOneLine::mousePressEvent(QMouseEvent *event)
 {
     if (event->button() != Qt::LeftButton)
         return;
@@ -425,7 +406,7 @@ void WidgetOneLine::mousePressEvent(QMouseEvent* event)
         pressState = PressMiddle;
 }
 
-void WidgetOneLine::mouseMoveEvent(QMouseEvent* event)
+void WidgetOneLine::mouseMoveEvent(QMouseEvent *event)
 {
 
     if (hidding) {
@@ -449,7 +430,7 @@ void WidgetOneLine::mouseMoveEvent(QMouseEvent* event)
     else {
 #ifdef _WIN32
         if (GetForegroundWindow() != (HWND)w->winId()) {
-            //qDebug("gfw!");
+            // qDebug("gfw!");
             INPUT ip[2] = { 0 };
             ip[0].type = INPUT_MOUSE;
             ip[0].mi.dwFlags = MOUSEEVENTF_LEFTDOWN;
@@ -466,7 +447,7 @@ void WidgetOneLine::mouseMoveEvent(QMouseEvent* event)
     }
 }
 
-void WidgetOneLine::mouseReleaseEvent(QMouseEvent* event)
+void WidgetOneLine::mouseReleaseEvent(QMouseEvent *event)
 {
     if (event->button() != Qt::LeftButton || pressState != PressMiddle)
         return;
@@ -474,7 +455,7 @@ void WidgetOneLine::mouseReleaseEvent(QMouseEvent* event)
     adjustPos();
 }
 
-void WidgetOneLine::paintEvent(QPaintEvent* event)
+void WidgetOneLine::paintEvent(QPaintEvent *event)
 {
     if (needRedraw) {
         renewCache();
@@ -524,21 +505,21 @@ void WidgetOneLine::paintEvent(QPaintEvent* event)
     painter.end();
 }
 
-void WidgetOneLine::contextMenuEvent(QContextMenuEvent* event)
+void WidgetOneLine::contextMenuEvent(QContextMenuEvent *event)
 {
-    popupMenu.popup(event->globalPos());
+    w->popupMenu.popup(event->globalPos());
 }
 
-void WidgetOneLine::leaveEvent(QEvent*)
+void WidgetOneLine::leaveEvent(QEvent *)
 {
-    if (hidePos != HIDEPOS_NONE && !popupMenu.isVisible() && !hidding) {
+    if (hidePos != HIDEPOS_NONE && !w->popupMenu.isVisible() && !hidding) {
         hidding = true;
         switch (hidePos) {
         case WidgetOneLine::HIDEPOS_LEFT:
             w->move(1 - w->width(), w->y());
             break;
         case WidgetOneLine::HIDEPOS_RIGHT: {
-            //QRect re = QApplication::desktop()->screenGeometry();
+            // QRect re = QApplication::desktop()->screenGeometry();
             auto re = QGuiApplication::screens()[0]->geometry();
             w->move(re.right(), w->y());
         } break;
@@ -546,7 +527,7 @@ void WidgetOneLine::leaveEvent(QEvent*)
             w->move(w->x(), 1 - w->height());
             break;
         case WidgetOneLine::HIDEPOS_BOTTOM: {
-            //QRect re = QApplication::desktop()->screenGeometry();
+            // QRect re = QApplication::desktop()->screenGeometry();
             auto re = QGuiApplication::screens()[0]->geometry();
             w->move(w->x(), re.bottom());
         } break;
@@ -563,7 +544,7 @@ void WidgetOneLine::prepareCachePainter()
     painter.setFont(pi->font);
 }
 
-void WidgetOneLine::textCache(int x, int length, char* cpos)
+void WidgetOneLine::textCache(int x, int length, char *cpos)
 {
     w->fileInfo.checkCurrentPiece();
     if (length < 0)
@@ -581,16 +562,16 @@ void WidgetOneLine::textCache(int x, int length, char* cpos)
     QString s;
     QTextDecoder td(w->fileInfo.codec, QTextCodec::IgnoreHeader);
     int spacing = 0;
-    char* lp = cpos;
+    char *lp = cpos;
     int spaceStart;
     while (cpos < w->fileInfo.contentEnd) {
         s = td.toUnicode(cpos, 1);
         if (!s.isEmpty()) {
-            textsInfo.append(TextInfo(s[0], x, -1, lp));
+            w->textsInfo.append(TextInfo(s[0], x, -1, lp));
             lp = cpos + 1;
             if (iswspace(s[0].unicode()) || s[0] == L'　') {
                 if (spacing == 0)
-                    spaceStart = textsInfo.count() - 1;
+                    spaceStart = w->textsInfo.count() - 1;
 
                 if (spacing != 1) {
                     if (s[0] == '\n')
@@ -604,10 +585,10 @@ void WidgetOneLine::textCache(int x, int length, char* cpos)
                     if (spacing == 1)
                         x += pi->fontm->maxWidth() * 2;
                     else {
-                        for (int i = spaceStart; i < textsInfo.count() - 1; i++) {
-                            int wid = pi->fontm->width(textsInfo[i].c);
-                            textsInfo[i].screenPos.rx() = x;
-                            textsInfo[i].screenPos.ry() = wid;
+                        for (int i = spaceStart; i < w->textsInfo.count() - 1; i++) {
+                            int wid = pi->fontm->width(w->textsInfo[i].c);
+                            w->textsInfo[i].screenPos.rx() = x;
+                            w->textsInfo[i].screenPos.ry() = wid;
                             x += wid;
                         }
                     }
@@ -620,17 +601,17 @@ void WidgetOneLine::textCache(int x, int length, char* cpos)
                     }
                     else if (x >= end) {
                         spaceRemain = x - end;
-                        textsInfo.removeLast();
+                        w->textsInfo.removeLast();
                         break;
                     }
                     spacing = 0;
-                    textsInfo.last().screenPos.rx() = x;
+                    w->textsInfo.last().screenPos.rx() = x;
                 }
 
                 painter.drawText(x, y, s);
                 int wid = pi->fontm->width(s[0]);
                 x += wid;
-                textsInfo.last().screenPos.ry() = wid;
+                w->textsInfo.last().screenPos.ry() = wid;
 
                 if (x >= cacheRealWidth) {
                     int nx = x - cacheRealWidth;
@@ -655,12 +636,12 @@ void WidgetOneLine::textCache(int x, int length, char* cpos)
     }
 }
 
-QString WidgetOneLine::getLastWord(int codecType, char*& p)
+QString WidgetOneLine::getLastWord(int codecType, char *&p)
 {
     QString s;
     QTextDecoder td(w->fileInfo.codec, QTextCodec::IgnoreHeader);
-    if (codecType == 0) { //utf8
-        char* me = nullptr;
+    if (codecType == 0) { // utf8
+        char *me = nullptr;
         while (p >= w->fileInfo.content) {
             if (static_cast<unsigned char>(*p) < 0x80) {
                 s = td.toUnicode(p, 1);
@@ -680,7 +661,7 @@ QString WidgetOneLine::getLastWord(int codecType, char*& p)
             p--;
         }
     }
-    else if (codecType == 1) { //utf16
+    else if (codecType == 1) { // utf16
         if (reinterpret_cast<uintptr_t>(p) & 1)
             p--;
         if (p >= w->fileInfo.content)
@@ -702,7 +683,7 @@ int WidgetOneLine::cacheAbsDistance(int start, int end)
     if (start <= end)
         return end - start;
     else {
-        //assert(end + cacheRealWidth - start >= 0);
+        // assert(end + cacheRealWidth - start >= 0);
         return end + cacheRealWidth - start;
     }
 }
@@ -723,14 +704,14 @@ void WidgetOneLine::textRemain(int start, int end, int cacheStart)
             start = 0;
         }
         painter.fillRect(start, 0, end - start, cache.height(), pi->background);
-        textCache(sle, cd, getNextPos(textsInfo.last().contentPos));
+        textCache(sle, cd, getNextPos(w->textsInfo.last().contentPos));
         painter.end();
     }
 }
 
 void WidgetOneLine::adjustPos()
 {
-    //auto r = QApplication::desktop()->screenGeometry();
+    // auto r = QApplication::desktop()->screenGeometry();
     auto r = QGuiApplication::screens()[0]->geometry();
     auto oor = w->geometry();
     if (w->width() > r.width())
@@ -764,7 +745,7 @@ void WidgetOneLine::endHide()
         w->move(0, w->y());
         break;
     case WidgetOneLine::HIDEPOS_RIGHT: {
-        //QRect re = QApplication::desktop()->screenGeometry();
+        // QRect re = QApplication::desktop()->screenGeometry();
         auto re = QGuiApplication::screens()[0]->geometry();
         w->move(re.width() - w->width(), w->y());
     } break;
@@ -772,24 +753,11 @@ void WidgetOneLine::endHide()
         w->move(w->x(), 0);
         break;
     case WidgetOneLine::HIDEPOS_BOTTOM: {
-        //QRect re = QApplication::desktop()->screenGeometry();
+        // QRect re = QApplication::desktop()->screenGeometry();
         auto re = QGuiApplication::screens()[0]->geometry();
         w->move(w->x(), re.height() - w->height());
     } break;
     default:
         break;
     }
-}
-
-void WidgetOneLine::onActionCopy()
-{
-    if (w->fileInfo.file.isOpen()) {
-        QString s;
-        for (const auto& ti : textsInfo) {
-            s += ti.c;
-        }
-        QApplication::clipboard()->setText(s);
-    }
-    else
-        QApplication::clipboard()->setText(WELCOMETEXT);
 }
