@@ -19,7 +19,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include "mainwindow.h"
 #include "ui_dialogindex.h"
 
-DialogIndex::DialogIndex(QWidget* parent)
+DialogIndex::DialogIndex(QWidget *parent)
     : QDialog(parent)
     , running(false)
     , ui(new Ui::DialogIndex)
@@ -58,8 +58,8 @@ void DialogIndex::workIndex()
     else
         maxByte = maxWord * 2;
 
-    char* p = w->fileInfo.content + startPos;
-    char* np;
+    char *p = w->fileInfo.content + startPos;
+    char *np;
     lastPiece = (w->fileInfo.contentEnd - w->fileInfo.content + 1) / PIECESIZE;
     QTextDecoder td(w->fileInfo.codec, QTextCodec::IgnoreHeader);
     if (w->fileInfo.codec->name().startsWith("UTF-16")) {
@@ -89,7 +89,7 @@ void DialogIndex::workIndex()
                 s = td.toUnicode(p, np - p);
 
             s.remove('\r');
-            for (const auto& r : regexps) {
+            for (const auto &r : regexps) {
                 auto ma = r.match(s);
                 if (ma.hasMatch()) {
                     emit indexFound(p, s, ma.capturedTexts());
@@ -202,6 +202,8 @@ void DialogIndex::save()
         sqdl.finish();
         sqi.finish();
         w->db.commit();
+        w->fileInfo.renewMapIndex();
+        w->fileInfo.setTitle();
     }
 }
 
@@ -264,7 +266,7 @@ void DialogIndex::on_pushButtonCreateIndex_clicked()
         if (isContinue) {
             for (int i = 0; i < ui->tableWidget->rowCount(); i++) {
                 auto s = ui->tableWidget->item(i, 1)->text();
-                for (auto& r : regexps2) {
+                for (auto &r : regexps2) {
                     auto ma = r.match(s);
                     if (ma.hasMatch()) {
                         testMlist(ma.capturedTexts());
@@ -284,10 +286,10 @@ void DialogIndex::on_pushButtonCreateIndex_clicked()
     }
 }
 
-void DialogIndex::testMlist(const QStringList& mlist)
+void DialogIndex::testMlist(const QStringList &mlist)
 {
     bool found = false;
-    for (auto& p : mapMlist) {
+    for (auto &p : mapMlist) {
         if (p.first.size() == mlist.size()) {
             int count = 0;
             for (int i = 0; i < mlist.size(); i++) {
@@ -309,7 +311,7 @@ void DialogIndex::testMlist(const QStringList& mlist)
     mlistlist.push_back(mlist);
 }
 
-void DialogIndex::onIndexFound(char* pos, const QString& s, const QStringList& mlist)
+void DialogIndex::onIndexFound(char *pos, const QString &s, const QStringList &mlist)
 {
     if (!running)
         return;
@@ -317,7 +319,7 @@ void DialogIndex::onIndexFound(char* pos, const QString& s, const QStringList& m
     QString n = QString::number(pos - w->fileInfo.content);
     int row = ui->tableWidget->rowCount();
     ui->tableWidget->setRowCount(row + 1);
-    QTableWidgetItem* twi = new QTableWidgetItem(n);
+    QTableWidgetItem *twi = new QTableWidgetItem(n);
     ui->tableWidget->setItem(row, 0, twi);
     twi = new QTableWidgetItem(s);
     ui->tableWidget->setItem(row, 1, twi);
@@ -336,8 +338,8 @@ void DialogIndex::onProcess(int value)
         discon();
         ui->progressBarIndex->setValue(100);
 
-        std::pair<const QStringList, int>* pp = nullptr;
-        for (auto& p : mapMlist) {
+        std::pair<const QStringList, int> *pp = nullptr;
+        for (auto &p : mapMlist) {
             if (!pp)
                 pp = &p;
             else {
@@ -347,7 +349,7 @@ void DialogIndex::onProcess(int value)
         }
 
         if (pp && w->settings->value("?app/quza", DEFAULT_QUZA).toBool()) {
-            const auto& ml = pp->first;
+            const auto &ml = pp->first;
             for (int i = 0; i < mlistlist.size();) {
                 if (mlistlist[i].size() == ml.size()) {
                     int c = 0;
@@ -374,7 +376,7 @@ void DialogIndex::onProcess(int value)
     }
 }
 
-char* DialogIndex::findNextN(char* pos)
+char *DialogIndex::findNextN(char *pos)
 {
     if (pos >= w->fileInfo.contentEnd)
         return nullptr;
@@ -388,7 +390,7 @@ char* DialogIndex::findNextN(char* pos)
             quint32 mp = (piece + 1) * PIECESIZE;
             if (utf16) {
                 int dis = pos - w->fileInfo.content;
-                while ((pos = (char*)memchr(pos, utf16n[1], mp - dis))) {
+                while ((pos = (char *)memchr(pos, utf16n[1], mp - dis))) {
                     if ((dis & 1) == 1) {
                         if (*(pos - 1) == utf16n[0])
                             return pos;
@@ -398,7 +400,7 @@ char* DialogIndex::findNextN(char* pos)
                 }
             }
             else {
-                pos = (char*)memchr(pos, '\n', mp - (pos - w->fileInfo.content));
+                pos = (char *)memchr(pos, '\n', mp - (pos - w->fileInfo.content));
                 if (pos)
                     return pos;
             }
@@ -412,7 +414,7 @@ char* DialogIndex::findNextN(char* pos)
         }
         else {
             if (utf16) {
-                while ((pos = (char*)memchr(pos, utf16n[1], w->fileInfo.contentEnd - pos))) {
+                while ((pos = (char *)memchr(pos, utf16n[1], w->fileInfo.contentEnd - pos))) {
                     if (((pos - w->fileInfo.content) & 1) == 1) {
                         if (*(pos - 1) == utf16n[0])
                             return pos;
@@ -421,7 +423,7 @@ char* DialogIndex::findNextN(char* pos)
                 }
             }
             else {
-                return (char*)memchr(pos, '\n', w->fileInfo.contentEnd - pos);
+                return (char *)memchr(pos, '\n', w->fileInfo.contentEnd - pos);
             }
             return nullptr;
         }
