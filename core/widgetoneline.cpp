@@ -53,7 +53,7 @@ void WidgetOneLine::lineMoveDown()
         while (it != w->textsInfo.end()) {
             int ix = it->screenPos.x();
             if (ix != x) {
-                w->fileInfo.currentPos = it->contentPos - w->fileInfo.content;
+                w->fileInfo.setCurrentPos(it->contentPos - w->fileInfo.content);
                 int end = ix + width() - pi->padding * 2;
                 if (end >= cacheRealWidth)
                     end -= cacheRealWidth;
@@ -74,7 +74,7 @@ void WidgetOneLine::lineMoveDown()
             }
             it++;
         }
-        w->fileInfo.currentPos = getNextPos((--it)->contentPos) - w->fileInfo.content;
+        w->fileInfo.setCurrentPos(getNextPos((--it)->contentPos) - w->fileInfo.content);
     }
     renewCache();
     update();
@@ -94,7 +94,7 @@ void WidgetOneLine::lineMoveUp()
     currentSpace = 0;
     offset = 0;
     if (prevLine) {
-        w->fileInfo.currentPos = prevLine - w->fileInfo.content;
+        w->fileInfo.setCurrentPos(prevLine - w->fileInfo.content);
         prevLine = nullptr;
     }
     else {
@@ -122,20 +122,20 @@ void WidgetOneLine::lineMoveUp()
                 }
                 else {
                     if (spacing == 2) {
-                        w->fileInfo.currentPos = spaceStart - w->fileInfo.content;
+                        w->fileInfo.setCurrentPos(spaceStart - w->fileInfo.content);
                     }
                     else if (spacing == 1) {
-                        w->fileInfo.currentPos = lp - w->fileInfo.content;
+                        w->fileInfo.setCurrentPos(lp - w->fileInfo.content);
                         prevLine = p;
                     }
                     else {
-                        w->fileInfo.currentPos = p - w->fileInfo.content;
+                        w->fileInfo.setCurrentPos(p - w->fileInfo.content);
                     }
                     break;
                 }
             }
             else if (p <= w->fileInfo.content) {
-                w->fileInfo.currentPos = 0;
+                w->fileInfo.setCurrentPos(0);
                 break;
             }
             lp = p;
@@ -183,7 +183,7 @@ void WidgetOneLine::pageMoveDown()
         prevLine = pl;
         prevPage = w->fileInfo.content + w->fileInfo.currentPos;
         currentSpace = spaceRemain;
-        w->fileInfo.currentPos = p - w->fileInfo.content;
+        w->fileInfo.setCurrentPos(p - w->fileInfo.content);
     }
     renewCache();
     update();
@@ -203,7 +203,7 @@ void WidgetOneLine::pageMoveUp()
     offset = 0;
     prevLine = nullptr;
     if (prevPage)
-        w->fileInfo.currentPos = prevPage - w->fileInfo.content;
+        w->fileInfo.setCurrentPos(prevPage - w->fileInfo.content);
     else {
         int nw;
         nw = width() - pi->padding * 2;
@@ -273,9 +273,9 @@ void WidgetOneLine::pageMoveUp()
                     if (nw <= 0) {
                     reach:;
                         if (w->fileInfo.currentPos == lp - w->fileInfo.content)
-                            w->fileInfo.currentPos = p - w->fileInfo.content;
+                            w->fileInfo.setCurrentPos(p - w->fileInfo.content);
                         else {
-                            w->fileInfo.currentPos = lp - w->fileInfo.content;
+                            w->fileInfo.setCurrentPos(lp - w->fileInfo.content);
                             prevLine = p;
                         }
                         break;
@@ -283,7 +283,7 @@ void WidgetOneLine::pageMoveUp()
                 }
             }
             else if (p <= w->fileInfo.content) {
-                w->fileInfo.currentPos = 0;
+                w->fileInfo.setCurrentPos(0);
                 break;
             }
             lp = p;

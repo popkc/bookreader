@@ -101,9 +101,11 @@ void FileInfo::loadFile(const QString &fn)
 
     w->currentOutput->needRedraw = true;
     w->currentOutput->update();
-    w->setWindowTitle(POPKC_TITLE + " - " + fn);
     w->ui->menuJump->setEnabled(true);
     w->ui->menuAutoRead->setEnabled(true);
+
+    renewMapIndex();
+    setTitle();
 }
 
 void FileInfo::close()
@@ -258,6 +260,53 @@ void FileInfo::prepareSentence()
         if (!s.isEmpty()) {
             w->textToSpeech.say(s);
             return;
+        }
+    }
+}
+
+void FileInfo::setTitle()
+{
+    QString title;
+    auto it = mapIndex.upperBound(currentPos);
+    if (it != mapIndex.begin()) {
+        it--;
+        title = it.value() + " - ";
+    }
+
+    w->setWindowTitle(title + file.fileName() + " - " + POPKC_TITLE);
+}
+
+void FileInfo::setCurrentPos(quint32 npos)
+{
+    currentPos = npos;
+    if (!mapIndex.empty())
+        setTitle();
+}
+
+void FileInfo::renewMapIndex()
+{
+    mapIndex.clear();
+    if (w->db.isOpen()) {
+        QSqlQuery gfid;
+        gfid.prepare("SELECT ROWID FROM 'files' WHERE file = ?");
+        gfid.bindValue(0, file.fileName());
+        gfid.exec();
+        int fileId;
+        if (gfid.next()) {
+            fileId = gfid.value(0).toInt();
+        }
+        else {
+            QSqlQuery ifile;
+            ifile.prepare("INSERT INTO 'files' (file) VALUES (?)");
+            ifile.bindValue(0, w->fileInfo.file.fileName());
+            fileId = ifile.lastInsertId().toInt();
+        }
+        QSqlQuery gi;
+        gi.prepare("SELECT pos,string FROM 'index' WHERE file = ?");
+        gi.bindValue(0, fileId);
+        gi.exec();
+        while (gi.next()) {
+            mapIndex.insert(gi.value(0).toUInt(), gi.value(1).toString());
         }
     }
 }

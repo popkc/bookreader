@@ -18,7 +18,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include "pch.h"
 
 #ifndef BOOKREADER_USE_QTSPEECH
-#include "core/texttospeech.h"
+#    include "core/texttospeech.h"
 using namespace popkc;
 #endif
 
@@ -28,37 +28,42 @@ class FileInfo : public QObject
 {
     Q_OBJECT
 public:
-    FileInfo(QObject *parent=nullptr);
-	~FileInfo();
+    FileInfo(QObject *parent = nullptr);
+    ~FileInfo();
 
-	void loadFile(const QString &fn);
-	void close();
-	void loadPiece(quint32 piece);
+    void loadFile(const QString &fn);
+    void close();
+    void loadPiece(quint32 piece);
     void detectCodec();
     void checkCurrentPiece();
     void saveReadPos();
     void startReading();
     void stopReading();
     void prepareSentence();
+    void setTitle();
+    void setCurrentPos(quint32 npos);
+    void renewMapIndex();
 
-    char* findLastParaStart(char *cpos);
-	int getCodecType();
+    char *findLastParaStart(char *cpos);
+    int getCodecType();
 
-	QFile file;
+    QFile file;
+    QMap<int, QString> mapIndex;
     std::atomic<bool> *pieceLoaded;
     quint32 pieceLoadedSize;
-	char* content;
-    char* contentEnd;
+    char *content;
+    char *contentEnd;
     quint32 currentPos;
     QTextCodec *codec;
-    char* nextSentencePos;
+    char *nextSentencePos;
     bool haveRead;
     QMutex mutexFile;
 public slots:
     void handleStateChanged(QTextToSpeech::State state);
+
 private:
     int utf8Detect();
     void moveToNsp();
 };
 
-char * myMemrchr(int len, char* memEnd, char c);
+char *myMemrchr(int len, char *memEnd, char c);

@@ -55,7 +55,7 @@ void WidgetFull::lineMoveDown()
             if (it->screenPos.y() != y) {
                 prevPage = nullptr;
                 prevLine = w->fileInfo.currentPos + w->fileInfo.content;
-                w->fileInfo.currentPos = it->contentPos - w->fileInfo.content;
+                w->fileInfo.setCurrentPos(it->contentPos - w->fileInfo.content);
                 if (needRedraw) {
                     renewCache();
                 }
@@ -125,7 +125,7 @@ void WidgetFull::lineMoveUp()
         assert(cp != newp);
     }
 
-    w->fileInfo.currentPos = newp - w->fileInfo.content;
+    w->fileInfo.setCurrentPos(newp - w->fileInfo.content);
 
     if (needRedraw || lineCount <= 2) {
         renewCache();
@@ -174,8 +174,8 @@ void WidgetFull::pageMoveDown()
         if (lineCount <= 2) {
             char *npos = getNextPos(w->textsInfo.back().contentPos);
             if (npos < w->fileInfo.contentEnd) {
-                prevLine = prevPage = w->fileInfo.content;
-                w->fileInfo.content = npos;
+                prevLine = prevPage = w->fileInfo.content + w->fileInfo.currentPos;
+                w->fileInfo.setCurrentPos(npos - w->fileInfo.content);
                 renewCache();
             }
             else
@@ -200,7 +200,7 @@ void WidgetFull::pageMoveDown()
                     prevLine = nit->contentPos;
 
                     w->textsInfo.erase(w->textsInfo.begin(), it);
-                    w->fileInfo.currentPos = it->contentPos - w->fileInfo.content;
+                    w->fileInfo.setCurrentPos(it->contentPos - w->fileInfo.content);
                     if (needRedraw) {
                         renewCache();
                     }
@@ -298,7 +298,7 @@ void WidgetFull::pageMoveUp()
         }
     }
 
-    w->fileInfo.currentPos = newp - w->fileInfo.content;
+    w->fileInfo.setCurrentPos(newp - w->fileInfo.content);
     renewCache();
     update();
 }
@@ -325,7 +325,7 @@ void WidgetFull::randomMove(quint32 pos)
     else
         p = cpos;
 
-    w->fileInfo.currentPos = p - w->fileInfo.content;
+    w->fileInfo.setCurrentPos(p - w->fileInfo.content);
     renewCache();
     update();
 }

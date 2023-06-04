@@ -88,7 +88,7 @@ void WidgetOutput::restoreState()
 
 void WidgetOutput::changeCurrentPos(quint32 pos)
 {
-    w->fileInfo.currentPos = pos;
+    w->fileInfo.setCurrentPos(pos);
     needRedraw = true;
     prevLine = nullptr;
     prevPage = nullptr;
