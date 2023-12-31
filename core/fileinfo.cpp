@@ -130,6 +130,8 @@ void FileInfo::close()
     w->ui->menuJump->setEnabled(false);
     w->ui->menuAutoRead->setEnabled(false);
     w->textsInfo.clear();
+    w->ui->widgetFull->clearData();
+    w->ui->widgetOneLine->clearData();
 }
 
 void FileInfo::loadPiece(quint32 piece)

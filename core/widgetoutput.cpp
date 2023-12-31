@@ -61,7 +61,17 @@ void WidgetOutput::wheelEvent(QWheelEvent *event)
     event->accept();
     w->ui->verticalScrollBar->setValue(w->fileInfo.currentPos);
 }
-
+/*
+void WidgetOutput::mouseDoubleClickEvent(QMouseEvent *)
+{
+    qDebug() << "dbc";
+    QPointF point(100, 100);
+    QPoint pa(0, -120);
+    QPoint pp;
+    QWheelEvent *we = new QWheelEvent(point, point, pp, pa, Qt::NoButton, Qt::NoModifier, Qt::ScrollUpdate, false, Qt::MouseEventSynthesizedByApplication);
+    QCoreApplication::postEvent(this, we);
+}
+*/
 char *WidgetOutput::getNextPos(char *cpos)
 {
     QTextDecoder decoder(w->fileInfo.codec, QTextCodec::IgnoreHeader);
@@ -126,4 +136,10 @@ bool WidgetOutput::isEndChar(QChar &c)
 
 void WidgetOutput::init()
 {
+}
+
+void WidgetOutput::clearData()
+{
+    prevLine = nullptr;
+    prevPage = nullptr;
 }

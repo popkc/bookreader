@@ -39,6 +39,7 @@ public:
     void changeCurrentPos(quint32 pos);
     bool isEndChar(QChar &c);
     void init();
+    void clearData();
 
     char *prevPage;
     char *prevLine;
@@ -46,8 +47,9 @@ public:
     int offset;
 
 protected:
-    void resizeEvent(QResizeEvent *event);
-    void wheelEvent(QWheelEvent *event);
+    void resizeEvent(QResizeEvent *event) override;
+    void wheelEvent(QWheelEvent *event) override;
+    // void mouseDoubleClickEvent(QMouseEvent *event) override;
 
     // char *cpos;
     // int left,top,x,y;
