@@ -1,5 +1,5 @@
 ﻿/*
-Copyright (C) 2020 popkc(popkcer at gmail dot com)
+Copyright (C) 2020-2024 popkc(popkc at 163 dot com)
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation, either version 3 of the License, or
@@ -15,6 +15,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 #include "mainwindow.h"
 #include "core/widgetoneline.h"
+#include "dialog/dialogabout.h"
 #include "dialog/dialogconfig.h"
 #include "dialog/dialogindex.h"
 #include "dialog/dialogsearch.h"
@@ -30,6 +31,7 @@ MainWindow::MainWindow(QWidget *parent)
     dialogConfig = nullptr;
     dialogSearch = nullptr;
     dialogIndex = nullptr;
+    dialogAbout = nullptr;
     stopWord = ",.?!:;<，。？！：;\r\n—…、";
 
     ui->setupUi(this);
@@ -57,9 +59,15 @@ MainWindow::~MainWindow()
 
 void MainWindow::init()
 {
-    settings = new QSettings("./" + QApplication::applicationName() + ".ini", QSettings::IniFormat, this);
     db = QSqlDatabase::addDatabase("QSQLITE");
+#ifdef _WIN32
+    settings = new QSettings("./" + QApplication::applicationName() + ".ini", QSettings::IniFormat, this);
     db.setDatabaseName("./" + QApplication::applicationName() + ".sqlite");
+#else
+    auto wpath = QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation) + "/";
+    settings = new QSettings(wpath + QApplication::applicationName() + ".ini", QSettings::IniFormat, this);
+    db.setDatabaseName(wpath + QApplication::applicationName() + ".sqlite");
+#endif
     if (db.open()) {
         db.exec("CREATE TABLE IF NOT EXISTS 'files' ("
                 "'file'	TEXT NOT NULL UNIQUE,"
@@ -716,4 +724,12 @@ void MainWindow::on_actionWindowed_triggered()
         ui->verticalScrollBar->setVisible(true);
         myMaximized();
     }
+}
+
+void MainWindow::on_actionAbout_triggered()
+{
+    if (!dialogAbout) {
+        dialogAbout = new DialogAbout(this);
+    }
+    dialogAbout->exec();
 }

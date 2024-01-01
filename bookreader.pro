@@ -23,6 +23,8 @@ win32: RC_ICONS += icon.ico
 
 TARGET = bookreader
 TEMPLATE = app
+VERSION=1.0.0
+DEFINES += APP_VERSION=\\\"$$VERSION\\\"
 
 # The following define makes your compiler emit warnings if you use
 # any feature of Qt which has been marked as deprecated (the exact warnings
@@ -43,6 +45,7 @@ include(qhotkey.pri)
 
 
 SOURCES += \
+    dialog/dialogabout.cpp \
         main.cpp \
         mainwindow.cpp \
     core/widgetoutput.cpp \
@@ -56,6 +59,7 @@ SOURCES += \
     dialog/formrollrate.cpp
 
 HEADERS += \
+    dialog/dialogabout.h \
         mainwindow.h \
     pch.h \
     core/widgetoutput.h \
@@ -69,6 +73,7 @@ HEADERS += \
     dialog/formrollrate.h
 
 FORMS += \
+    dialog/dialogabout.ui \
         mainwindow.ui \
     dialog/dialogconfig.ui \
     dialog/dialogsearch.ui \

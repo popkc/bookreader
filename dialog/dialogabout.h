@@ -1,4 +1,4 @@
-﻿/*
+/*
 Copyright (C) 2020-2024 popkc(popkc at 163 dot com)
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -13,32 +13,28 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
-#include "formrollrate.h"
-#include "ui_formrollrate.h"
-#include "mainwindow.h"
-#include "dialogconfig.h"
+#ifndef DIALOGABOUT_H
+#define DIALOGABOUT_H
 
-FormRollRate::FormRollRate(QWidget *parent) :
-    QWidget(parent),
-    ui(new Ui::FormRollRate)
-{
-    ui->setupUi(this);
-    ui->horizontalSlider->setMinimum(MIN_ROLLRATE);
-    ui->horizontalSlider->setMaximum(MAX_ROLLRATE);
+#include <QDialog>
+
+namespace Ui {
+class DialogAbout;
 }
 
-FormRollRate::~FormRollRate()
+class DialogAbout : public QDialog
 {
-    delete ui;
-}
+    Q_OBJECT
 
-void FormRollRate::renewValue()
-{
-    ui->horizontalSlider->setValue(w->rollRate);
-}
+public:
+    explicit DialogAbout(QWidget *parent = nullptr);
+    ~DialogAbout();
 
-void FormRollRate::on_horizontalSlider_valueChanged(int value)
-{
-	if(w)
-		w->rollRate=value;
-}
+private slots:
+    void on_pushButtonClose_clicked();
+
+private:
+    Ui::DialogAbout *ui;
+};
+
+#endif // DIALOGABOUT_H

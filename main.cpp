@@ -1,5 +1,5 @@
 ﻿/*
-Copyright (C) 2020 popkc(popkcer at gmail dot com)
+Copyright (C) 2020-2024 popkc(popkc at 163 dot com)
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation, either version 3 of the License, or
@@ -23,6 +23,8 @@ MainWindow *w;
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
+    a.setApplicationName("bookreader");
+    a.setOrganizationName("popkc");
     QTranslator tl;
     tl.load("qt_zh_CN.qm");
     a.installTranslator(&tl);

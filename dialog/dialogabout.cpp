@@ -1,4 +1,4 @@
-﻿/*
+/*
 Copyright (C) 2020-2024 popkc(popkc at 163 dot com)
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -13,32 +13,24 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
-#include "formrollrate.h"
-#include "ui_formrollrate.h"
-#include "mainwindow.h"
-#include "dialogconfig.h"
+#include "dialogabout.h"
+#include "ui_dialogabout.h"
 
-FormRollRate::FormRollRate(QWidget *parent) :
-    QWidget(parent),
-    ui(new Ui::FormRollRate)
+DialogAbout::DialogAbout(QWidget *parent)
+    : QDialog(parent)
+    , ui(new Ui::DialogAbout)
 {
     ui->setupUi(this);
-    ui->horizontalSlider->setMinimum(MIN_ROLLRATE);
-    ui->horizontalSlider->setMaximum(MAX_ROLLRATE);
+    ui->labelVersion->setText("POPKC阅读软件 " APP_VERSION);
+    setFixedSize(size());
 }
 
-FormRollRate::~FormRollRate()
+DialogAbout::~DialogAbout()
 {
     delete ui;
 }
 
-void FormRollRate::renewValue()
+void DialogAbout::on_pushButtonClose_clicked()
 {
-    ui->horizontalSlider->setValue(w->rollRate);
-}
-
-void FormRollRate::on_horizontalSlider_valueChanged(int value)
-{
-	if(w)
-		w->rollRate=value;
+    this->close();
 }

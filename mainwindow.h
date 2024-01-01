@@ -1,5 +1,5 @@
 ﻿/*
-Copyright (C) 2020 popkc(popkcer at gmail dot com)
+Copyright (C) 2020-2024 popkc(popkc at 163 dot com)
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation, either version 3 of the License, or
@@ -33,6 +33,7 @@ class DialogConfig;
 class DialogSearch;
 class DialogIndex;
 class FormRollRate;
+class DialogAbout;
 
 struct PaintInfo
 {
@@ -86,11 +87,11 @@ public:
     WidgetOutput *currentOutput;
     QSettings *settings;
     QSystemTrayIcon *trayIcon;
+    QList<TextInfo> textsInfo;
+    QAction *actionCopy;
+    QMenu popupMenu;
     int rollRate;
     bool isOneLine;
-    QList<TextInfo> textsInfo;
-    QMenu popupMenu;
-    QAction *actionCopy;
     bool inited;
 public slots:
     void actionOpenTriggered();
@@ -139,6 +140,8 @@ private slots:
 
     void on_actionWindowed_triggered();
 
+    void on_actionAbout_triggered();
+
 private:
     void oneLineMode();
     void fullMode();
@@ -161,6 +164,7 @@ private:
     QWidgetAction *waRollRate;
     QMenu *trayMenu;
     QAction *actionShow;
+    DialogAbout *dialogAbout;
 };
 
 extern MainWindow *w;
