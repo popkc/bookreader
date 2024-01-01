@@ -39,6 +39,7 @@ MainWindow::MainWindow(QWidget *parent)
     formRollRate = new FormRollRate();
     waRollRate->setDefaultWidget(formRollRate);
     ui->menuAutoRead->addAction(waRollRate);
+    ui->actionFullScreen->setShortcut(QKeySequence(Qt::Key_Tab));
 
     trayIcon = nullptr;
 
@@ -479,12 +480,15 @@ void MainWindow::on_actionMovePrev_triggered()
 void MainWindow::keyPressEvent(QKeyEvent *event)
 {
     if (fileInfo.file.isOpen()) {
-        if (event->key() == Qt::Key_Enter || event->key() == Qt::Key_Return) {
-            ui->actionAutoRoll->toggle();
-            return;
-        }
         if (!ui->actionRead->isChecked()) {
             switch (event->key()) {
+            case Qt::Key_Enter:
+            case Qt::Key_Return:
+                ui->actionAutoRoll->toggle();
+                return;
+            case Qt::Key_Tab:
+                ui->actionFullScreen->trigger();
+                return;
             case Qt::Key_PageDown:
                 currentOutput->pageMoveDown();
                 break;
@@ -659,6 +663,10 @@ bool MainWindow::clearDisplayActions(QAction *ac)
 void MainWindow::myMaximized()
 {
     if (inited) {
+#ifdef Q_OS_LINUX
+        // linux下部分窗口管理器有BUG，直接最大化会出错
+        this->showNormal();
+#endif
         this->showMaximized();
     }
 }
@@ -672,10 +680,17 @@ void MainWindow::on_actionFullScreen_triggered()
         this->showFullScreen();
     }
     else {
-        if (settings->value("?app/display", DEFAULT_DISPLAY).toInt() == 0)
-            ui->actionWindowed->trigger();
-        else
-            ui->actionNoBorder->trigger();
+        if ((this->windowFlags() & Qt::FramelessWindowHint)) {
+            // if (settings->value("?app/display", DEFAULT_DISPLAY).toInt() != 0) {
+            clearDisplayActions(ui->actionNoBorder);
+            myMaximized();
+        }
+        else {
+            clearDisplayActions(ui->actionWindowed);
+            menuBar()->setVisible(true);
+            ui->verticalScrollBar->setVisible(true);
+            myMaximized();
+        }
     }
 }
 
