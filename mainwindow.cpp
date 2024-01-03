@@ -167,6 +167,8 @@ void MainWindow::oneLineMode()
     isOneLine = true;
     currentOutput->needRedraw = true;
     currentOutput->offset = 0;
+    currentOutput->prevLine = nullptr;
+    currentOutput->prevPage = nullptr;
     ui->actionOneLineMode->setChecked(true);
     ui->actionFullMode->setChecked(false);
     ui->menuDisplay->setEnabled(false);
@@ -189,6 +191,8 @@ void MainWindow::fullMode()
     isOneLine = false;
     currentOutput->needRedraw = true;
     currentOutput->offset = 0;
+    currentOutput->prevLine = nullptr;
+    currentOutput->prevPage = nullptr;
     ui->actionOneLineMode->setChecked(false);
     ui->actionFullMode->setChecked(true);
     ui->menuDisplay->setEnabled(true);
@@ -487,15 +491,17 @@ void MainWindow::on_actionMovePrev_triggered()
 
 void MainWindow::keyPressEvent(QKeyEvent *event)
 {
+    if (event->key() == Qt::Key_Tab) {
+        ui->actionFullScreen->trigger();
+        return;
+    }
+
     if (fileInfo.file.isOpen()) {
         if (!ui->actionRead->isChecked()) {
             switch (event->key()) {
             case Qt::Key_Enter:
             case Qt::Key_Return:
                 ui->actionAutoRoll->toggle();
-                return;
-            case Qt::Key_Tab:
-                ui->actionFullScreen->trigger();
                 return;
             case Qt::Key_PageDown:
                 currentOutput->pageMoveDown();

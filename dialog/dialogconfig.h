@@ -72,7 +72,7 @@ class DialogConfig;
 #ifdef _WIN32
 #    define DEFAULT_FONTFAMALY "微软雅黑"
 #else
-#    define DEFAULT_FONTFAMALY "Sans"
+#    define DEFAULT_FONTFAMALY "Sans Serif"
 #endif
 
 #define ONELINE_FONTFAMALY DEFAULT_FONTFAMALY

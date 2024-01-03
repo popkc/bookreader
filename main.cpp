@@ -31,8 +31,8 @@ int main(int argc, char *argv[])
     w = new MainWindow;
     w->init();
     if (w->isOneLine) {
-        static_cast<WidgetOneLine *>(w->currentOutput)->adjustHeight();
         w->currentOutput->restoreState();
+        static_cast<WidgetOneLine *>(w->currentOutput)->adjustHeight();
     }
     else
         w->showMaximized();

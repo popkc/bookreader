@@ -390,7 +390,8 @@ start:;
 
 void WidgetOneLine::adjustHeight()
 {
-    w->resize(w->width(), pi->fontm->height() + pi->linespace * 2);
+    int h = pi->fontm->height() + pi->linespace * 2;
+    w->resize(w->width(), h);
 }
 
 void WidgetOneLine::mousePressEvent(QMouseEvent *event)
@@ -648,15 +649,15 @@ QString WidgetOneLine::getLastWord(int codecType, char *&p)
                 break;
             }
             else if (static_cast<unsigned char>(*p) < 0xc0) {
+                if (!me)
+                    me = p;
+            }
+            else if (static_cast<unsigned char>(*p) < 0xfe) {
                 if (me)
                     s = td.toUnicode(p, me - p + 1);
                 else
                     s = td.toUnicode(p, 1);
                 break;
-            }
-            else if (static_cast<unsigned char>(*p) < 0xfe) {
-                if (!me)
-                    me = p;
             }
             p--;
         }
