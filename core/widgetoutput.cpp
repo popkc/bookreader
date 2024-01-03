@@ -90,9 +90,10 @@ void WidgetOutput::saveState()
 
 void WidgetOutput::restoreState()
 {
-#ifndef Q_OS_LINUX
-    w->restoreGeometry(w->settings->value("?oneline/geometry").toByteArray());
+#ifdef Q_OS_LINUX
+    if (!w->inited)
 #endif
+        w->restoreGeometry(w->settings->value("?oneline/geometry").toByteArray());
     w->showNormal();
     if (w->width() < 10)
         w->resize(10, w->height());
