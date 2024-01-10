@@ -31,12 +31,12 @@ public:
     virtual void lineMoveUp() = 0;
     virtual void pageMoveDown() = 0;
     virtual void pageMoveUp() = 0;
-    virtual void randomMove(quint32 pos) = 0;
+    virtual void randomMove(uintptr_t pos) = 0;
     virtual void renewCache() = 0;
     virtual void addOffset(int value) = 0;
     void saveState();
     void restoreState();
-    void changeCurrentPos(quint32 pos);
+    void changeCurrentPos(uintptr_t pos);
     bool isEndChar(QChar &c);
     void init();
     void clearData();

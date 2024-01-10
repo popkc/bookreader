@@ -19,42 +19,43 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include "pch.h"
 
 namespace popkc {
-    class QVoice
-    {
-    public:
-        QString name() const;
-        CComPtr<ISpObjectToken> cpVoiceToken;
-    };
+class QVoice
+{
+public:
+    QString name() const;
+    CComPtr<ISpObjectToken> cpVoiceToken;
+};
 
-    class QTextToSpeech : public QObject
-    {
-        Q_OBJECT
-    public:
-        enum State {
-            Ready,
-            Speaking,
-            Paused,
-            BackendError
-        } state;
+class QTextToSpeech : public QObject
+{
+    Q_OBJECT
+public:
+    enum State {
+        Ready,
+        Speaking,
+        Paused,
+        BackendError
+    } state;
 
-        QTextToSpeech(QObject *parent=nullptr);
-        QVector<QVoice> availableVoices();
-        void setVoice(const QVoice &v);
-        void setPitch(double pitch);
-        void setRate(double rate);
-        void setVolume(double volume);
-        void say(const QString &s);
-        void stop();
-        static void init();
+    QTextToSpeech(QObject *parent = nullptr);
+    QVector<QVoice> availableVoices();
+    void setVoice(const QVoice &v);
+    void setPitch(double pitch);
+    void setRate(double rate);
+    void setVolume(double volume);
+    void say(const QString &s);
+    void stop();
+    static void init();
 
-        CComPtr<ISpVoice> cpVoice;
-        WCHAR *speakString;
-    signals:
-        void stateChanged(State state);
-    private:
-        QVector<WCHAR> pitchXML;
-    };
+    CComPtr<ISpVoice> cpVoice;
+    WCHAR *speakString;
+signals:
+    void stateChanged(State state);
 
-    void __stdcall sapiEventHandler(WPARAM wparam, LPARAM lparam);
+private:
+    QVector<WCHAR> pitchXML;
+};
+
+void __stdcall sapiEventHandler(WPARAM wparam, LPARAM lparam);
 }
 #endif // TEXTTOSPEECH_H

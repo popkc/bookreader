@@ -303,11 +303,11 @@ void WidgetFull::pageMoveUp()
     update();
 }
 
-void WidgetFull::randomMove(quint32 pos)
+void WidgetFull::randomMove(uintptr_t pos)
 {
     offset = 0;
     prevLine = prevPage = nullptr;
-    quint32 piece = pos / PIECESIZE;
+    uintptr_t piece = pos / PIECESIZE;
     if (piece >= 1)
         w->fileInfo.loadPiece(piece - 1);
     w->fileInfo.loadPiece(piece);
@@ -317,6 +317,7 @@ void WidgetFull::randomMove(quint32 pos)
     char *cpos = w->fileInfo.content + pos;
     char *p = w->fileInfo.findLastParaStart(cpos + 1);
     if (p) {
+        assert(p <= cpos && cpos - p <= 4096);
         auto ls = findLineStop(p, cpos);
         if (!ls.empty()) {
             p = ls.back();
@@ -451,7 +452,7 @@ void WidgetFull::renewCache()
 
 void WidgetFull::addOffset(int value)
 {
-    if (w->fileInfo.currentPos >= w->fileInfo.file.size() || w->textsInfo.isEmpty()) {
+    if (w->fileInfo.currentPos >= (uintptr_t)w->fileInfo.file.size() || w->textsInfo.isEmpty()) {
         w->ui->actionAutoRoll->setChecked(false);
         return;
     }
@@ -556,6 +557,7 @@ QList<char *> WidgetFull::findLineStop(char *p, char *cp)
     QList<char *> lineStop;
     int x = 0;
     char *lastCharStart = p;
+    assert(cp - p <= 4096);
     while (p < cp) {
         QString s = decoder.toUnicode(p, 1);
         p++;

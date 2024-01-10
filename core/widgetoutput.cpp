@@ -59,7 +59,7 @@ void WidgetOutput::wheelEvent(QWheelEvent *event)
         return;
     }
     event->accept();
-    w->ui->verticalScrollBar->setValue(w->fileInfo.currentPos);
+    w->ui->verticalScrollBar->setValue(w->fileInfo.currentPos >> w->fileInfo.sliderShift);
 }
 /*
 void WidgetOutput::mouseDoubleClickEvent(QMouseEvent *)
@@ -99,7 +99,7 @@ void WidgetOutput::restoreState()
         w->resize(10, w->height());
 }
 
-void WidgetOutput::changeCurrentPos(quint32 pos)
+void WidgetOutput::changeCurrentPos(uintptr_t pos)
 {
     w->fileInfo.setCurrentPos(pos);
     needRedraw = true;
@@ -107,7 +107,7 @@ void WidgetOutput::changeCurrentPos(quint32 pos)
     prevPage = nullptr;
     update();
 
-    w->ui->verticalScrollBar->setValue(pos);
+    w->ui->verticalScrollBar->setValue(pos >> w->fileInfo.sliderShift);
 }
 
 bool WidgetOutput::isEndChar(QChar &c)

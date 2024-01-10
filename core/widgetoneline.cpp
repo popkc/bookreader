@@ -215,9 +215,8 @@ void WidgetOneLine::pageMoveUp()
                 nw -= y;
         }
 
-        int piece = w->fileInfo.currentPos / PIECESIZE - 1;
-        if (piece >= 0)
-            w->fileInfo.loadPiece(piece);
+        uintptr_t piece = w->fileInfo.currentPos / PIECESIZE - 1;
+        w->fileInfo.loadPiece(piece);
         int codecType = w->fileInfo.getCodecType();
 
         QString s;
@@ -272,7 +271,7 @@ void WidgetOneLine::pageMoveUp()
                     nw -= pi->fontm->width(s[0]);
                     if (nw <= 0) {
                     reach:;
-                        if (w->fileInfo.currentPos == lp - w->fileInfo.content)
+                        if (w->fileInfo.currentPos == (uintptr_t)(lp - w->fileInfo.content))
                             w->fileInfo.setCurrentPos(p - w->fileInfo.content);
                         else {
                             w->fileInfo.setCurrentPos(lp - w->fileInfo.content);
@@ -294,7 +293,7 @@ void WidgetOneLine::pageMoveUp()
     update();
 }
 
-void WidgetOneLine::randomMove(quint32 pos)
+void WidgetOneLine::randomMove(uintptr_t pos)
 {
     changeCurrentPos(pos);
 }
@@ -311,7 +310,7 @@ void WidgetOneLine::renewCache()
     }
     else {
         int wid = width() - pi->padding * 2;
-        if (wid > currentSpace && w->fileInfo.currentPos < w->fileInfo.file.size()) {
+        if (wid > currentSpace && w->fileInfo.currentPos < (uintptr_t)w->fileInfo.file.size()) {
             textCache(currentSpace, wid - currentSpace, w->fileInfo.content + w->fileInfo.currentPos);
         }
     }
@@ -349,7 +348,7 @@ start:;
 
                 if (y <= offset) {
                     int oo = offset - y;
-                    quint32 cp = w->fileInfo.currentPos;
+                    uintptr_t cp = w->fileInfo.currentPos;
                     lineMoveDown();
                     if (cp == w->fileInfo.currentPos) {
                         w->ui->actionAutoRoll->setChecked(false);

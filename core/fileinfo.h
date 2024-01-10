@@ -33,7 +33,7 @@ public:
 
     void loadFile(const QString &fn);
     void close();
-    void loadPiece(quint32 piece);
+    void loadPiece(uintptr_t piece);
     void detectCodec();
     void checkCurrentPiece();
     void saveReadPos();
@@ -41,7 +41,7 @@ public:
     void stopReading();
     void prepareSentence();
     void setTitle();
-    void setCurrentPos(quint32 npos);
+    void setCurrentPos(uintptr_t npos);
     void renewMapIndex();
 
     char *findLastParaStart(char *cpos);
@@ -50,12 +50,13 @@ public:
     QFile file;
     QMap<int, QString> mapIndex;
     std::atomic<bool> *pieceLoaded;
-    quint32 pieceLoadedSize;
+    uintptr_t pieceLoadedSize;
     char *content;
     char *contentEnd;
-    quint32 currentPos;
+    uintptr_t currentPos;
     QTextCodec *codec;
     char *nextSentencePos;
+    uint32_t sliderShift;
     bool haveRead;
     QMutex mutexFile;
 public slots:
@@ -66,4 +67,4 @@ private:
     void moveToNsp();
 };
 
-char *myMemrchr(int len, char *memEnd, char c);
+char *myMemrchr(intptr_t len, char *memEnd, char c);

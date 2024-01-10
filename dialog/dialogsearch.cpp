@@ -37,8 +37,8 @@ void DialogSearch::workFind()
     QByteArrayMatcher bam(baToFind);
     char *pos = startPos;
     char *endPos;
-    int lastPiece = (w->fileInfo.contentEnd - w->fileInfo.content - 1) / PIECESIZE;
-    int piece = (pos - w->fileInfo.content) / PIECESIZE;
+    uintptr_t lastPiece = (w->fileInfo.contentEnd - w->fileInfo.content - 1) / PIECESIZE;
+    uintptr_t piece = (pos - w->fileInfo.content) / PIECESIZE;
     do {
         while (!w->fileInfo.pieceLoaded[piece]) {
             // qDebug("wait for piece");
@@ -66,8 +66,8 @@ void DialogSearch::workFind()
 
 void DialogSearch::workLoad()
 {
-    int piece = (startPos - w->fileInfo.content) / PIECESIZE;
-    int lastPiece = (w->fileInfo.contentEnd - w->fileInfo.content - 1) / PIECESIZE;
+    uintptr_t piece = (startPos - w->fileInfo.content) / PIECESIZE;
+    uintptr_t lastPiece = (w->fileInfo.contentEnd - w->fileInfo.content - 1) / PIECESIZE;
     do {
         w->fileInfo.loadPiece(piece);
         piece++;
@@ -161,7 +161,7 @@ void DialogSearch::onFound(char *pos)
         if (w->ui->actionRead->isChecked())
             w->ui->actionRead->setChecked(false);
         w->currentOutput->randomMove(pos - w->fileInfo.content);
-        w->ui->verticalScrollBar->setValue(w->fileInfo.currentPos);
+        w->ui->verticalScrollBar->setValue(w->fileInfo.currentPos >> w->fileInfo.sliderShift);
         if (!w->isOneLine) {
             WidgetFull *wf = reinterpret_cast<WidgetFull *>(w->currentOutput);
             wf->selectedStart = pos;

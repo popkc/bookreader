@@ -33,7 +33,7 @@ class DialogIndex : public QDialog
     Q_OBJECT
 
 public:
-    explicit DialogIndex(QWidget* parent = 0);
+    explicit DialogIndex(QWidget *parent = 0);
     ~DialogIndex();
     void setupRegexps();
     void workIndex();
@@ -41,21 +41,21 @@ public:
     void init();
     void save();
     QVector<QRegularExpression> regexps, regexps2;
-    DialogIndexAdvance* dialogIndexAdvance;
+    DialogIndexAdvance *dialogIndexAdvance;
     int maxWord;
     // std::thread threadIndex, threadLoad;
     std::atomic_bool running;
-    quint32 startPos;
+    uintptr_t startPos;
     std::atomic<int> finishedCount;
 signals:
-    void indexFound(char* pos, const QString& s, const QStringList& mlist);
+    void indexFound(char *pos, const QString &s, const QStringList &mlist);
     void process(int value);
 private slots:
     void on_pushButtonAdvance_clicked();
 
     void on_pushButtonCreateIndex_clicked();
 
-    void onIndexFound(char* pos, const QString& s, const QStringList& mlist);
+    void onIndexFound(char *pos, const QString &s, const QStringList &mlist);
     void onProcess(int value);
     void on_pushButtonClear_clicked();
 
@@ -66,20 +66,20 @@ private slots:
     void on_pushButtonCurrentPos_clicked();
 
 private:
-    Ui::DialogIndex* ui;
+    Ui::DialogIndex *ui;
     std::map<QStringList, int> mapMlist;
     QList<QStringList> mlistlist;
     int fileId;
     bool utf16;
-    int lastPiece;
-    int piece;
+    uintptr_t lastPiece;
+    uintptr_t piece;
     QByteArray utf16n;
     bool changed;
     int isContinue;
-    char* findNextN(char* pos);
+    char *findNextN(char *pos);
     void discon();
     void selectCurrentPos();
-    void testMlist(const QStringList& mlist);
+    void testMlist(const QStringList &mlist);
 };
 
 #endif // DIALOGINDEX_H

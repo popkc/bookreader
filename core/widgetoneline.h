@@ -31,7 +31,7 @@ public:
     virtual void lineMoveUp() override;
     virtual void pageMoveDown() override;
     virtual void pageMoveUp() override;
-    virtual void randomMove(quint32 pos) override;
+    virtual void randomMove(uintptr_t pos) override;
     virtual void renewCache() override;
     virtual void addOffset(int value) override;
     void adjustHeight();

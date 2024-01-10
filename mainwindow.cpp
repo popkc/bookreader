@@ -430,13 +430,13 @@ void MainWindow::on_verticalScrollBar_actionTriggered(int action)
             currentOutput->pageMoveUp();
             break;
         case QAbstractSlider::SliderMove:
-            currentOutput->randomMove(ui->verticalScrollBar->sliderPosition());
+            currentOutput->randomMove((uintptr_t)ui->verticalScrollBar->sliderPosition() << fileInfo.sliderShift);
             break;
         default:
             break;
         }
     }
-    ui->verticalScrollBar->setValue(w->fileInfo.currentPos);
+    ui->verticalScrollBar->setValue(w->fileInfo.currentPos >> fileInfo.sliderShift);
 }
 
 void MainWindow::onTimerSave()
@@ -470,7 +470,7 @@ void MainWindow::onActionShow()
 void MainWindow::on_actionMoveNext_triggered()
 {
     if (fileInfo.file.isOpen()) {
-        if (fileInfo.currentPos < fileInfo.file.size() - 1) {
+        if (fileInfo.currentPos < (uintptr_t)fileInfo.file.size() - 1) {
             fileInfo.currentPos++;
             currentOutput->needRedraw = true;
             currentOutput->update();
@@ -518,7 +518,7 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
             default:
                 goto nothandle;
             }
-            ui->verticalScrollBar->setValue(fileInfo.currentPos);
+            ui->verticalScrollBar->setValue(fileInfo.currentPos >> fileInfo.sliderShift);
             return;
         nothandle:
             if (ui->actionAutoRoll->isChecked()) {

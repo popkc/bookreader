@@ -25,6 +25,7 @@ FileInfo::FileInfo(QObject *parent)
 {
     content = nullptr;
     pieceLoaded = nullptr;
+    sliderShift = 0;
 }
 
 FileInfo::~FileInfo()
@@ -44,10 +45,12 @@ void FileInfo::loadFile(const QString &fn)
         return;
     }
 
+#if QT_POINTER_SIZE == 4
     if (file.size() > 2147483647) {
         QMessageBox::warning(w, tr("错误"), tr("文件大小不能超过2GB。"));
         return;
     }
+#endif
 
     w->currentOutput->offset = 0;
 
@@ -67,12 +70,28 @@ void FileInfo::loadFile(const QString &fn)
     memset(pieceLoaded, 0, sizeof(std::atomic<bool>) * pieceLoadedSize);
 
     if (file.size() != 0) {
-        content = new char[file.size()];
+        try {
+            content = new char[file.size()];
+        } catch (const std::exception &) {
+            QMessageBox::warning(w, tr("错误"), tr("没有足够的内存打开此文件。"));
+            file.close();
+            w->currentOutput->needRedraw = true;
+            w->currentOutput->update();
+            return;
+        }
         contentEnd = content + file.size();
-        w->ui->verticalScrollBar->setMaximum(file.size() - 1);
+        uint64_t m = file.size() - 1;
+        sliderShift = 0;
+        while (m > INT32_MAX) {
+            sliderShift++;
+            m >>= 1;
+        }
+        w->ui->verticalScrollBar->setMaximum(m);
     }
-    else
+    else {
         w->ui->verticalScrollBar->setMaximum(0);
+        sliderShift = 0;
+    }
 
     QByteArray ba = w->settings->value(fn + "/?codec").toByteArray();
     if (ba.isEmpty())
@@ -95,9 +114,9 @@ void FileInfo::loadFile(const QString &fn)
     }
 
     currentPos = w->settings->value(fn + "/?pos", 0).toUInt();
-    if (file.size() <= currentPos)
+    if ((uintptr_t)file.size() <= currentPos)
         currentPos = 0;
-    w->ui->verticalScrollBar->setValue(currentPos);
+    w->ui->verticalScrollBar->setValue(currentPos >> sliderShift);
 
     w->currentOutput->needRedraw = true;
     w->currentOutput->update();
@@ -134,7 +153,7 @@ void FileInfo::close()
     w->ui->widgetOneLine->clearData();
 }
 
-void FileInfo::loadPiece(quint32 piece)
+void FileInfo::loadPiece(uintptr_t piece)
 {
     if (pieceLoaded[piece])
         return;
@@ -184,7 +203,7 @@ void FileInfo::detectCodec()
 
 void FileInfo::checkCurrentPiece()
 {
-    quint32 cp = currentPos / PIECESIZE;
+    uintptr_t cp = currentPos / PIECESIZE;
     if (cp < pieceLoadedSize)
         loadPiece(cp);
     else
@@ -198,7 +217,7 @@ void FileInfo::checkCurrentPiece()
 void FileInfo::saveReadPos()
 {
     if (file.isOpen()) {
-        w->settings->setValue(file.fileName() + "/?pos", currentPos);
+        w->settings->setValue(file.fileName() + "/?pos", QVariant::fromValue(currentPos));
     }
 }
 
@@ -278,7 +297,7 @@ void FileInfo::setTitle()
     w->setWindowTitle(title + file.fileName() + " - " + POPKC_TITLE);
 }
 
-void FileInfo::setCurrentPos(quint32 npos)
+void FileInfo::setCurrentPos(uintptr_t npos)
 {
     currentPos = npos;
     if (!mapIndex.empty())
@@ -315,12 +334,14 @@ void FileInfo::renewMapIndex()
 
 char *FileInfo::findLastParaStart(char *cpos)
 {
-    quint32 piece = (cpos - content) / PIECESIZE;
+    assert(cpos > content);
+    char *ocp = cpos;
+    uintptr_t piece = (cpos - content) / PIECESIZE;
     if (piece >= 1)
         loadPiece(piece - 1);
 
     cpos--;
-    int dis = cpos - content;
+    intptr_t dis = cpos - content;
     bool nearStart;
     if (dis > 4096) {
         dis = 4096;
@@ -366,6 +387,7 @@ char *FileInfo::findLastParaStart(char *cpos)
                     cpos = p;
                     continue;
                 }
+                assert(ocp - p <= 4096);
                 return p + 1;
             }
             else if (nearStart)
@@ -474,11 +496,11 @@ void FileInfo::moveToNsp()
             w->currentOutput->pageMoveDown();
         }
     }
-    w->ui->verticalScrollBar->setValue(currentPos);
+    w->ui->verticalScrollBar->setValue(currentPos >> sliderShift);
 }
 
 //算法来自于glibc里的memrchr函数
-char *myMemrchr(int len, char *memEnd, char c)
+char *myMemrchr(intptr_t len, char *memEnd, char c)
 {
     uintptr_t l = sizeof(uintptr_t) - 1;
     uintptr_t lc, tl;

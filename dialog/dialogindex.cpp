@@ -106,8 +106,8 @@ end:;
 
 void DialogIndex::workLoad()
 {
-    int piece = startPos / PIECESIZE;
-    int lastPiece = (w->fileInfo.contentEnd - w->fileInfo.content - 1) / PIECESIZE;
+    uintptr_t piece = startPos / PIECESIZE;
+    uintptr_t lastPiece = (w->fileInfo.contentEnd - w->fileInfo.content - 1) / PIECESIZE;
     do {
         w->fileInfo.loadPiece(piece);
         piece++;
@@ -387,7 +387,7 @@ char *DialogIndex::findNextN(char *pos)
         }
 
         if (piece < lastPiece) {
-            quint32 mp = (piece + 1) * PIECESIZE;
+            uintptr_t mp = (piece + 1) * PIECESIZE;
             if (utf16) {
                 int dis = pos - w->fileInfo.content;
                 while ((pos = (char *)memchr(pos, utf16n[1], mp - dis))) {
@@ -491,8 +491,8 @@ void DialogIndex::on_pushButtonDel_clicked()
 
 void DialogIndex::on_tableWidget_cellDoubleClicked(int row, int)
 {
-    quint32 cp = ui->tableWidget->item(row, 0)->text().toUInt();
-    if (cp >= w->fileInfo.file.size()) {
+    uintptr_t cp = ui->tableWidget->item(row, 0)->text().toUInt();
+    if (cp >= (quint64)w->fileInfo.file.size()) {
         QMessageBox::warning(this, tr("错误"), tr("索引位置超过了文件大小，请重新建立索引！"));
         return;
     }
