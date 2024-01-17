@@ -492,7 +492,7 @@ void DialogIndex::on_pushButtonDel_clicked()
 void DialogIndex::on_tableWidget_cellDoubleClicked(int row, int)
 {
     uintptr_t cp = ui->tableWidget->item(row, 0)->text().toUInt();
-    if (cp >= (quint64)w->fileInfo.file.size()) {
+    if (cp >= (uintptr_t)w->fileInfo.file.size()) {
         QMessageBox::warning(this, tr("错误"), tr("索引位置超过了文件大小，请重新建立索引！"));
         return;
     }

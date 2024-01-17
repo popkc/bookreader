@@ -23,7 +23,7 @@ win32: RC_ICONS += icon.ico
 
 TARGET = bookreader
 TEMPLATE = app
-VERSION=1.1.0
+VERSION=1.1.1
 DEFINES += APP_VERSION=\\\"$$VERSION\\\"
 
 # The following define makes your compiler emit warnings if you use

@@ -148,11 +148,13 @@ acfound:;
 
 void MainWindow::init2()
 {
-    hotKeyRead = new QHotkey(QKeySequence(Qt::CTRL + Qt::Key_F12), true, QApplication::instance());
-    if (hotKeyRead->isRegistered())
-        connect(hotKeyRead, &QHotkey::activated, this, &MainWindow::handleHotKeyRead);
-    else
-        QMessageBox::warning(this, tr("错误"), tr("注册热键Ctrl+F12失败。"));
+    if (QHotkey::isPlatformSupported()) {
+        hotKeyRead = new QHotkey(QKeySequence(Qt::CTRL + Qt::Key_F12), true, QApplication::instance());
+        if (hotKeyRead->isRegistered())
+            connect(hotKeyRead, &QHotkey::activated, this, &MainWindow::handleHotKeyRead);
+        else
+            QMessageBox::warning(this, tr("错误"), tr("注册热键Ctrl+F12失败。"));
+    }
     inited = true;
 }
 
