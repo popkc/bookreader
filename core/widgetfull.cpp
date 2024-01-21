@@ -267,13 +267,13 @@ void WidgetFull::pageMoveUp()
             }
             else if (needLine < 0) {
                 auto it = ls.begin();
-                //此时needLine用于表示lineStop中多出的行，不再是需要的行的意思
+                // 此时needLine用于表示lineStop中多出的行，不再是需要的行的意思
                 it -= needLine + 1;
                 if (it == ls.begin())
                     prevLine = newp;
                 else
                     prevLine = *(it - 1);
-                //如果lineStop中多出的行超过一页的数量，则可以设置prevPage
+                // 如果lineStop中多出的行超过一页的数量，则可以设置prevPage
                 needLine += lineCount - 2;
                 if (needLine == 0)
                     prevPage = newp;
@@ -525,7 +525,7 @@ void WidgetFull::textCache(int start, int count, char *cpos)
                 int fw;
                 if (s != "\r") {
                     lastChar = s[0];
-                    fw = w->paintInfo.fontm->width(s[0]);
+                    fw = w->paintInfo.fontm->HORIZONTALADVANCE(s[0]);
                     if (x != 0 && x + fw > cache.width()) {
                         count--;
                         if (count <= 0)
@@ -562,7 +562,7 @@ QList<char *> WidgetFull::findLineStop(char *p, char *cp)
         QString s = decoder.toUnicode(p, 1);
         p++;
         if (!s.isEmpty() && s[0] != '\r' && s[0] != '\n') {
-            int cw = w->paintInfo.fontm->width(s[0]);
+            int cw = w->paintInfo.fontm->HORIZONTALADVANCE(s[0]);
             if (x == 0) {
                 x += cw;
             }
@@ -630,7 +630,7 @@ char *WidgetFull::fillLine(char *end)
             if (s[0] == '\n')
                 return end + 1;
             else if (s[0] != '\r') {
-                int cw = w->paintInfo.fontm->width(s);
+                int cw = w->paintInfo.fontm->HORIZONTALADVANCE(s);
                 if (x != 0 && x + cw > cache.width()) {
                     return lastPos;
                 }

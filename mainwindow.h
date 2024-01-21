@@ -17,11 +17,16 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #define MAINWINDOW_H
 
 #include "core/fileinfo.h"
-#include "pch.h"
 
 #ifndef BOOKREADER_USE_QTSPEECH
 #    include "core/texttospeech.h"
 using namespace popkc;
+#endif
+
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 11, 0))
+#    define HORIZONTALADVANCE horizontalAdvance
+#else
+#    define HORIZONTALADVANCE width
 #endif
 
 namespace Ui {

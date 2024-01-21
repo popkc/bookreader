@@ -250,7 +250,7 @@ void MainWindow::setupFont()
     paintInfo.font.setFamily(settings->value("?app/fontfamily", DEFAULT_FONTFAMALY).toString());
     paintInfo.font.setPointSize(settings->value("?app/fontsize", DEFAULT_FONTPOINTSIZE).toInt());
     paintInfo.font.setStyleName(settings->value("?app/fontstyle", DEFAULT_FONTSTYLE).toString());
-    paintInfo.font.setWeight(settings->value("?app/fontweight", DEFAULT_FONTPOINTWEIGHT).toInt());
+    paintInfo.font.setWeight(QFont::Weight(settings->value("?app/fontweight", DEFAULT_FONTPOINTWEIGHT).toInt()));
     paintInfo.font.setItalic(settings->value("?app/fontitalic", DEFAULT_FONTITALIC).toBool());
 
     if (paintInfo.fontm)
@@ -284,7 +284,7 @@ void MainWindow::setupFont()
         olPaintInfo.font.setFamily(settings->value("?oneline/fontfamily", ONELINE_FONTFAMALY).toString());
         olPaintInfo.font.setPointSize(settings->value("?oneline/fontsize", ONELINE_FONTPOINTSIZE).toInt());
         olPaintInfo.font.setStyleName(settings->value("?oneline/fontstyle", ONELINE_FONTSTYLE).toString());
-        olPaintInfo.font.setWeight(settings->value("?oneline/fontweight", ONELINE_FONTPOINTWEIGHT).toInt());
+        olPaintInfo.font.setWeight(QFont::Weight(settings->value("?oneline/fontweight", ONELINE_FONTPOINTWEIGHT).toInt()));
         olPaintInfo.font.setItalic(settings->value("?oneline/fontitalic", ONELINE_FONTITALIC).toBool());
 
         if (olPaintInfo.fontm)

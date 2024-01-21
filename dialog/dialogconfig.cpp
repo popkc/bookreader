@@ -18,7 +18,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include "mainwindow.h"
 #include "ui_dialogconfig.h"
 
-DialogConfig::DialogConfig(QWidget* parent)
+DialogConfig::DialogConfig(QWidget *parent)
     : QDialog(parent)
     , ui(new Ui::DialogConfig)
 {
@@ -27,7 +27,7 @@ DialogConfig::DialogConfig(QWidget* parent)
     ui->horizontalSliderRollRate->setMaximum(MAX_ROLLRATE);
 
     auto vlist = w->textToSpeech.availableVoices();
-    for (const QVoice& v : vlist) {
+    for (const QVoice &v : vlist) {
         ui->comboBoxVoice->addItem(v.name());
     }
 }
@@ -54,7 +54,7 @@ void DialogConfig::init()
     olBackColor.setRgb(bgr, bgg, bgb);
     olFont.setFamily(w->settings->value("?oneline/fontfamily", ONELINE_FONTFAMALY).toString());
     olFont.setPointSize(w->settings->value("?oneline/fontsize", ONELINE_FONTPOINTSIZE).toInt());
-    olFont.setWeight(w->settings->value("?oneline/fontweight", ONELINE_FONTPOINTWEIGHT).toInt());
+    olFont.setWeight(QFont::Weight(w->settings->value("?oneline/fontweight", ONELINE_FONTPOINTWEIGHT).toInt()));
     olFont.setItalic(w->settings->value("?oneline/fontitalic", ONELINE_FONTITALIC).toBool());
     olFont.setStyleName(w->settings->value("?oneline/fontstyle", ONELINE_FONTSTYLE).toString());
 
@@ -155,7 +155,7 @@ void DialogConfig::on_pushButtonFont_clicked()
 {
     bool ok;
     QFont f = QFontDialog::getFont(&ok, font, this);
-    //qDebug(f.styleName().toUtf8());
+    // qDebug(f.styleName().toUtf8());
     if (ok) {
         font = f;
     }

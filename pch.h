@@ -35,6 +35,10 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #    include <sphelper.h>
 #endif
 
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
+#    include <QtCore5Compat>
+#endif
+
 #include <QtGui>
 #include <QtSql>
 #include <QtWidgets>

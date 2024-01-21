@@ -15,7 +15,6 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 #include "core/widgetoneline.h"
 #include "mainwindow.h"
-#include "pch.h"
 #include "ui_mainwindow.h"
 
 WidgetOneLine::WidgetOneLine(QWidget *parent)
@@ -109,7 +108,7 @@ void WidgetOneLine::lineMoveUp()
             p--;
             s = getLastWord(ct, p);
             if (!s.isEmpty()) {
-                if (iswspace(s[0].unicode()) || s[0] == L'　') {
+                if (iswspace(s[0].unicode()) || s[0] == QChar(L'　')) {
                     if (spacing == 0)
                         spaceStart = p;
 
@@ -229,7 +228,7 @@ void WidgetOneLine::pageMoveUp()
             p--;
             s = getLastWord(codecType, p);
             if (!s.isEmpty()) {
-                if (iswspace(s[0].unicode()) || s[0] == L'　') {
+                if (iswspace(s[0].unicode()) || s[0] == QChar(L'　')) {
                     if (spacing == 0) {
                         spaceStart = lp;
                         spaceInfos.clear();
@@ -257,7 +256,7 @@ void WidgetOneLine::pageMoveUp()
                             auto it = spaceInfos.end();
                             do {
                                 it--;
-                                nw -= pi->fontm->width(it->first);
+                                nw -= pi->fontm->HORIZONTALADVANCE(it->first);
                                 if (nw <= 0) {
                                     it++;
                                     if (it != spaceInfos.end())
@@ -268,7 +267,7 @@ void WidgetOneLine::pageMoveUp()
                         }
                         spacing = 0;
                     }
-                    nw -= pi->fontm->width(s[0]);
+                    nw -= pi->fontm->HORIZONTALADVANCE(s[0]);
                     if (nw <= 0) {
                     reach:;
                         if (w->fileInfo.currentPos == (uintptr_t)(lp - w->fileInfo.content))
@@ -569,7 +568,7 @@ void WidgetOneLine::textCache(int x, int length, char *cpos)
         if (!s.isEmpty()) {
             w->textsInfo.append(TextInfo(s[0], x, -1, lp));
             lp = cpos + 1;
-            if (iswspace(s[0].unicode()) || s[0] == L'　') {
+            if (iswspace(s[0].unicode()) || s[0] == QChar(L'　')) {
                 if (spacing == 0)
                     spaceStart = w->textsInfo.count() - 1;
 
@@ -586,7 +585,7 @@ void WidgetOneLine::textCache(int x, int length, char *cpos)
                         x += pi->fontm->maxWidth() * 2;
                     else {
                         for (int i = spaceStart; i < w->textsInfo.count() - 1; i++) {
-                            int wid = pi->fontm->width(w->textsInfo[i].c);
+                            int wid = pi->fontm->HORIZONTALADVANCE(w->textsInfo[i].c);
                             w->textsInfo[i].screenPos.rx() = x;
                             w->textsInfo[i].screenPos.ry() = wid;
                             x += wid;
@@ -609,7 +608,7 @@ void WidgetOneLine::textCache(int x, int length, char *cpos)
                 }
 
                 painter.drawText(x, y, s);
-                int wid = pi->fontm->width(s[0]);
+                int wid = pi->fontm->HORIZONTALADVANCE(s[0]);
                 x += wid;
                 w->textsInfo.last().screenPos.ry() = wid;
 

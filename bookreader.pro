@@ -7,6 +7,7 @@
 QT       += core gui sql
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
+equals(QT_MAJOR_VERSION, 6): QT += core5compat
 
 !win32 {
 DEFINES += BOOKREADER_USE_QTSPEECH
