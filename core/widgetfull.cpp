@@ -581,6 +581,7 @@ QList<char *> WidgetFull::findLineStop(char *p, char *cp)
 
 char *WidgetFull::fillLine(char *end)
 {
+    char *originEnd = end;
     char *lastPos;
     end--;
     QByteArray ba;
@@ -601,6 +602,7 @@ char *WidgetFull::fillLine(char *end)
                 s = decoder.toUnicode(end, 1);
             }
             else if (*reinterpret_cast<unsigned char *>(end) >= 0xc0) {
+                ba.prepend(*end);
                 s = decoder.toUnicode(ba);
                 ba.clear();
             }
@@ -627,8 +629,10 @@ char *WidgetFull::fillLine(char *end)
         }
 
         if (!s.isEmpty()) {
-            if (s[0] == '\n')
-                return end + 1;
+            if (s[0] == '\n') {
+                if (end != originEnd - 1)
+                    return end + 1;
+            }
             else if (s[0] != '\r') {
                 int cw = w->paintInfo.fontm->HORIZONTALADVANCE(s);
                 if (x != 0 && x + cw > cache.width()) {
