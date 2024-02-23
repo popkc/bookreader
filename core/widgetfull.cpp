@@ -127,7 +127,7 @@ void WidgetFull::lineMoveUp()
 
     w->fileInfo.setCurrentPos(newp - w->fileInfo.content);
 
-    if (needRedraw || lineCount <= 2) {
+    if (needRedraw || lineCount <= 2 || w->fileInfo.currentPos == 0) {
         renewCache();
         update();
         return;
