@@ -136,6 +136,7 @@ void DialogIndex::init()
 
     if (w->db.isOpen()) {
         ui->tableWidget->clearContents();
+        ui->tableWidget->setRowCount(0);
         QSqlQuery gfid;
         gfid.prepare("SELECT ROWID FROM 'files' WHERE file = ?");
         gfid.bindValue(0, w->fileInfo.file.fileName());

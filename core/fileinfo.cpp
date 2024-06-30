@@ -67,8 +67,9 @@ void FileInfo::loadFile(const QString &fn)
         delete[] pieceLoaded;
     pieceLoadedSize = (file.size() - 1) / PIECESIZE + 1;
     pieceLoaded = new std::atomic<bool>[pieceLoadedSize];
+#if (__cplusplus < 202000)
     memset(pieceLoaded, 0, sizeof(std::atomic<bool>) * pieceLoadedSize);
-
+#endif
     if (file.size() != 0) {
         try {
             content = new char[file.size()];
