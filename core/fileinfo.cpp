@@ -342,7 +342,6 @@ void FileInfo::iterateDirectory(bool isNext)
     QStringList sl;
     sl << "*.txt";
     auto el = d.entryList(sl, QDir::NoFilter, QDir::Name | QDir::IgnoreCase);
-    QString prev;
     for (auto it = el.begin(); it != el.end(); it++) {
         if (*it == fn) {
             if (isNext) {
@@ -352,13 +351,13 @@ void FileInfo::iterateDirectory(bool isNext)
                 }
             }
             else {
-                if (!prev.isEmpty()) {
-                    loadFile(d.filePath(prev));
+                if (it != el.begin()) {
+                    it--;
+                    loadFile(d.filePath(*it));
                 }
             }
             return;
         }
-        prev = *it;
     }
 }
 
