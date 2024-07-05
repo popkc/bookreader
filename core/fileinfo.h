@@ -43,6 +43,7 @@ public:
     void setTitle();
     void setCurrentPos(uintptr_t npos);
     void renewMapIndex();
+    void iterateDirectory(bool isNext);
 
     char *findLastParaStart(char *cpos);
     int getCodecType();

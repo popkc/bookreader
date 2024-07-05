@@ -39,6 +39,7 @@ FileInfo::~FileInfo()
 
 void FileInfo::loadFile(const QString &fn)
 {
+    close();
     file.setFileName(fn);
     if (!file.open(QFile::ReadOnly)) {
         QMessageBox::warning(w, tr("错误"), tr("打开文件失败，文件名：") + fn);
@@ -330,6 +331,34 @@ void FileInfo::renewMapIndex()
         while (gi.next()) {
             mapIndex.insert(gi.value(0).toUInt(), gi.value(1).toString());
         }
+    }
+}
+
+void FileInfo::iterateDirectory(bool isNext)
+{
+    auto fi = QFileInfo(file.fileName());
+    auto d = fi.dir();
+    auto fn = fi.fileName();
+    QStringList sl;
+    sl << "*.txt";
+    auto el = d.entryList(sl, QDir::NoFilter, QDir::Name | QDir::IgnoreCase);
+    QString prev;
+    for (auto it = el.begin(); it != el.end(); it++) {
+        if (*it == fn) {
+            if (isNext) {
+                it++;
+                if (it != el.end()) {
+                    loadFile(d.filePath(*it));
+                }
+            }
+            else {
+                if (!prev.isEmpty()) {
+                    loadFile(d.filePath(prev));
+                }
+            }
+            return;
+        }
+        prev = *it;
     }
 }
 

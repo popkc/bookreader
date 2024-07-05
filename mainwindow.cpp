@@ -369,7 +369,6 @@ void MainWindow::actionOpenTriggered()
     }
     s = QFileDialog::getOpenFileName(this, "", s, tr("文本文件 (*.txt);;所有文件 (*)"));
     if (!s.isEmpty()) {
-        fileInfo.close();
         fileInfo.loadFile(s);
     }
 }
@@ -516,6 +515,12 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
                 break;
             case Qt::Key_Up:
                 currentOutput->lineMoveUp();
+                break;
+            case Qt::Key_Delete:
+                fileInfo.iterateDirectory(true);
+                break;
+            case Qt::Key_Insert:
+                fileInfo.iterateDirectory(false);
                 break;
             default:
                 goto nothandle;
