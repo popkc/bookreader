@@ -147,6 +147,8 @@ private slots:
 
     void on_actionAbout_triggered();
 
+    void on_actionCreateIndex_triggered();
+
 private:
     void oneLineMode();
     void fullMode();

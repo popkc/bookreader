@@ -50,10 +50,12 @@ public:
 signals:
     void indexFound(char *pos, const QString &s, const QStringList &mlist);
     void process(int value);
+
+public slots:
+    void on_pushButtonCreateIndex_clicked();
+
 private slots:
     void on_pushButtonAdvance_clicked();
-
-    void on_pushButtonCreateIndex_clicked();
 
     void onIndexFound(char *pos, const QString &s, const QStringList &mlist);
     void onProcess(int value);

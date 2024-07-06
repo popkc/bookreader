@@ -522,6 +522,9 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
             case Qt::Key_Insert:
                 fileInfo.iterateDirectory(false);
                 break;
+            case Qt::Key_F2:
+                this->on_actionCreateIndex_triggered();
+                break;
             default:
                 goto nothandle;
             }
@@ -745,4 +748,19 @@ void MainWindow::on_actionAbout_triggered()
         dialogAbout = new DialogAbout(this);
     }
     dialogAbout->exec();
+}
+
+void MainWindow::on_actionCreateIndex_triggered()
+{
+    if (!w->db.isOpen()) {
+        QMessageBox::warning(this, "错误", "无法打开数据库。");
+        return;
+    }
+    if (!dialogIndex) {
+        dialogIndex = new DialogIndex(this);
+    }
+    dialogIndex->init();
+    dialogIndex->on_pushButtonCreateIndex_clicked();
+    dialogIndex->exec();
+    dialogIndex->save();
 }
