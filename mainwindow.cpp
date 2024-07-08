@@ -76,7 +76,7 @@ void MainWindow::init()
         db.exec("CREATE TABLE IF NOT EXISTS 'index' ("
                 "'file'	INTEGER NOT NULL,"
                 "'pos'	INTEGER NOT NULL,"
-                "'string'	TEXT NOT NULL,"
+                "'string'	TEXT,"
                 "PRIMARY KEY('file','pos')"
                 ") WITHOUT ROWID");
     }
