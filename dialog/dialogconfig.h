@@ -43,7 +43,11 @@ class DialogConfig;
 #define DEFAULT_FONTITALIC false
 #define DEFAULT_FONTSTYLE ""
 
-#define DEFAULT_LINESPACE 0
+#ifdef Q_OS_WINDOWS
+#    define DEFAULT_LINESPACE 1
+#else
+#    define DEFAULT_LINESPACE 0
+#endif
 #define DEFAULT_PADDING 1
 #define DEFAULT_SMARTRETURN false
 
