@@ -505,6 +505,7 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
                 ui->actionAutoRoll->toggle();
                 return;
             case Qt::Key_PageDown:
+            case Qt::Key_Space:
                 currentOutput->pageMoveDown();
                 break;
             case Qt::Key_PageUp:
