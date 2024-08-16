@@ -1,4 +1,4 @@
-﻿/*
+/*
 Copyright (C) 2020-2024 popkc(popkc at 163 dot com)
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -24,7 +24,7 @@ class DialogIndex;
 
 class DialogIndexAdvance;
 
-#define DEFAULT_REGEXPS (QStringList() << tr("(^|[\\s　])(正文|作品相关|前传|后传|外传|引子|锲子)([\\s　]|$)") << tr("(^|[\\s　纪传])第?(\\d+|[两零一二三四五六七八九壹贰叁肆伍陆柒捌玖十百千万拾佰仟〇]+|序)([篇章节集卷部\\s　\\.\\-—]|$)") << tr("(^|[\\s　])[篇章节卷部集]\\s*(\\d|[两零一二三四五六七八九壹贰叁肆伍陆柒捌玖十百千万拾佰仟〇])") << tr("(纪|传)([\\s\\(（　]|$)"))
+#define DEFAULT_REGEXPS (QStringList() << tr("(^|[\\s　])(正文|作品相关|前传|后传|外传|引子|锲子)([\\s　]|$)") << tr("(^|[\\s　#纪传])第?(\\d+|[两零一二三四五六七八九壹贰叁肆伍陆柒捌玖十百千万拾佰仟〇]+|序)([篇章节集卷部\\s　\\.\\-—]|$)") << tr("(^|[\\s　])[篇章节卷部集]\\s*(\\d|[两零一二三四五六七八九壹贰叁肆伍陆柒捌玖十百千万拾佰仟〇])") << tr("(纪|传)([\\s\\(（　]|$)"))
 #define DEFAULT_MAXWORD 50
 #define DEFAULT_QUZA true
 
