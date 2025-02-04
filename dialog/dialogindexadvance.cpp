@@ -18,7 +18,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include "mainwindow.h"
 #include "ui_dialogindexadvance.h"
 
-DialogIndexAdvance::DialogIndexAdvance(QWidget* parent)
+DialogIndexAdvance::DialogIndexAdvance(QWidget *parent)
     : QDialog(parent)
     , ui(new Ui::DialogIndexAdvance)
 {
@@ -37,6 +37,7 @@ void DialogIndexAdvance::init()
     ui->listWidgetIndex->addItems(sl);
     ui->spinBoxMaxWord->setValue(w->settings->value("?app/indexmaxword", DEFAULT_MAXWORD).toInt());
     ui->checkBoxQuZa->setChecked(w->settings->value("?app/quza", DEFAULT_QUZA).toBool());
+    ui->checkBoxRemoveDuplication->setChecked(w->settings->value("?app/removeduplication", DEFAULT_REMOVEDUPLICATION).toBool());
 }
 
 void DialogIndexAdvance::on_pushButtonAdd_clicked()
@@ -77,6 +78,8 @@ void DialogIndexAdvance::on_pushButtonDefault_clicked()
     ui->listWidgetIndex->clear();
     ui->listWidgetIndex->addItems(DEFAULT_REGEXPS);
     ui->spinBoxMaxWord->setValue(DEFAULT_MAXWORD);
+    ui->checkBoxQuZa->setChecked(DEFAULT_QUZA);
+    ui->checkBoxRemoveDuplication->setChecked(DEFAULT_REMOVEDUPLICATION);
 }
 
 void DialogIndexAdvance::on_pushButtonCancel_clicked()
@@ -94,7 +97,8 @@ void DialogIndexAdvance::on_pushButtonOk_clicked()
     w->settings->setValue("?app/indexregexps", sl);
     w->settings->setValue("?app/indexmaxword", ui->spinBoxMaxWord->value());
     w->settings->setValue("?app/quza", ui->checkBoxQuZa->isChecked());
-    static_cast<DialogIndex*>(parent())->setupRegexps();
+    w->settings->setValue("?app/removeduplication", ui->checkBoxRemoveDuplication->isChecked());
+    static_cast<DialogIndex *>(parent())->setupRegexps();
     this->accept();
 }
 
@@ -107,7 +111,7 @@ void DialogIndexAdvance::on_pushButtonTest_clicked()
     }
 
     QString s = ui->lineEditTest->text();
-    for (const auto& r : re) {
+    for (const auto &r : re) {
         if (r.match(s).hasMatch()) {
             QMessageBox::about(this, tr("提示"), tr("匹配成功！"));
             return;

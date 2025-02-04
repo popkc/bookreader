@@ -282,7 +282,7 @@ void DialogIndex::on_pushButtonCreateIndex_clicked()
         ui->progressBarIndex->setValue(0);
 
         while (finishedCount > 0) {
-            QThread::usleep(10);
+            QThread::usleep(10000);
         }
     }
 }
@@ -317,8 +317,15 @@ void DialogIndex::onIndexFound(char *pos, const QString &s, const QStringList &m
     if (!running)
         return;
 
-    QString n = QString::number(pos - w->fileInfo.content);
     int row = ui->tableWidget->rowCount();
+    if (w->settings->value("?app/removeduplication", DEFAULT_REMOVEDUPLICATION).toBool()) {
+        for (int i = 0; i < row; i++) {
+            if (ui->tableWidget->item(i, 1)->text() == s) {
+                return;
+            }
+        }
+    }
+    QString n = QString::number(pos - w->fileInfo.content);
     ui->tableWidget->setRowCount(row + 1);
     QTableWidgetItem *twi = new QTableWidgetItem(n);
     ui->tableWidget->setItem(row, 0, twi);
@@ -372,7 +379,7 @@ void DialogIndex::onProcess(int value)
         QMessageBox::about(this, tr("提示"), tr("索引建立完毕！"));
         ui->progressBarIndex->setValue(0);
         while (finishedCount > 0) {
-            QThread::usleep(10);
+            QThread::usleep(10000);
         }
     }
 }
