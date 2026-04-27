@@ -15,6 +15,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 #include "dialog/dialogindex.h"
 #include "core/widgetoutput.h"
+#include "dialogconfig.h"
 #include "dialogindexadvance.h"
 #include "mainwindow.h"
 #include "ui_dialogindex.h"
@@ -41,13 +42,13 @@ DialogIndex::~DialogIndex()
 
 void DialogIndex::setupRegexps()
 {
-    QStringList sl = w->settings->value("?app/indexregexps", DEFAULT_REGEXPS).toStringList();
+    QStringList sl = w->settings->value(SETTINGS_INDEXREGEXPS, DEFAULT_REGEXPS).toStringList();
     regexps.resize(sl.size());
     for (int i = 0; i < sl.size(); i++) {
         regexps[i].setPattern(sl[i]);
     }
     regexps2 = regexps;
-    maxWord = w->settings->value("?app/indexmaxword", DEFAULT_MAXWORD).toInt();
+    maxWord = w->settings->value(SETTINGS_INDEXMAXWORD, DEFAULT_MAXWORD).toInt();
 }
 
 void DialogIndex::workIndex()
@@ -318,7 +319,7 @@ void DialogIndex::onIndexFound(char *pos, const QString &s, const QStringList &m
         return;
 
     int row = ui->tableWidget->rowCount();
-    if (w->settings->value("?app/removeduplication", DEFAULT_REMOVEDUPLICATION).toBool()) {
+    if (w->settings->value(SETTINGS_REMOVEDUPLICATION, DEFAULT_REMOVEDUPLICATION).toBool()) {
         for (int i = 0; i < row; i++) {
             if (ui->tableWidget->item(i, 1)->text() == s) {
                 return;
@@ -356,7 +357,7 @@ void DialogIndex::onProcess(int value)
             }
         }
 
-        if (pp && w->settings->value("?app/quza", DEFAULT_QUZA).toBool()) {
+        if (pp && w->settings->value(SETTINGS_QUZA, DEFAULT_QUZA).toBool()) {
             const auto &ml = pp->first;
             for (int i = 0; i < mlistlist.size();) {
                 if (mlistlist[i].size() == ml.size()) {

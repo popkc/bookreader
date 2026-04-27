@@ -34,8 +34,8 @@ class DialogConfig;
 #define DEFAULTFONTR 213
 #define DEFAULTFONTG 238
 #define DEFAULTFONTB 138
-#define DEFAULTBGR 28
-#define DEFAULTBGG 74
+#define DEFAULTBGR 0x15
+#define DEFAULTBGG 0x36
 #define DEFAULTBGB 0
 
 #define DEFAULT_FONTPOINTSIZE 30
@@ -80,6 +80,50 @@ class DialogConfig;
 #endif
 
 #define ONELINE_FONTFAMALY DEFAULT_FONTFAMALY
+
+#define SETTINGS_SHOWTRAY "?app/showtray"
+#define SETTINGS_ONELINEMODE "?app/onelinemode"
+#define SETTINGS_CODEC "?app/codec"
+#define SETTINGS_RECENTFILES "?app/recentfiles"
+#define SETTINGS_DISPLAY "?app/display"
+#define SETTINGS_FONTR "?app/fontr"
+#define SETTINGS_FONTG "?app/fontg"
+#define SETTINGS_FONTB "?app/fontb"
+#define SETTINGS_BGR "?app/bgr"
+#define SETTINGS_BGG "?app/bgg"
+#define SETTINGS_BGB "?app/bgb"
+#define SETTINGS_FONTFAMILY "?app/fontfamily"
+#define SETTINGS_FONTSIZE "?app/fontsize"
+#define SETTINGS_FONTSTYLE "?app/fontstyle"
+#define SETTINGS_FONTWEIGHT "?app/fontweight"
+#define SETTINGS_FONTITALIC "?app/fontitalic"
+#define SETTINGS_LINESPACE "?app/linespace"
+#define SETTINGS_PADDING "?app/padding"
+#define SETTINGS_SMARTRETURN "?app/smartreturn"
+#define SETTINGS_ROLLRATE "?app/rollrate"
+#define SETTINGS_ONELINE_SAMEASFULL "?oneline/sameasfull"
+#define SETTINGS_ONELINE_FONTR "?oneline/fontr"
+#define SETTINGS_ONELINE_FONTG "?oneline/fontg"
+#define SETTINGS_ONELINE_FONTB "?oneline/fontb"
+#define SETTINGS_ONELINE_BGR "?oneline/bgr"
+#define SETTINGS_ONELINE_BGG "?oneline/bgg"
+#define SETTINGS_ONELINE_BGB "?oneline/bgb"
+#define SETTINGS_ONELINE_FONTFAMILY "?oneline/fontfamily"
+#define SETTINGS_ONELINE_FONTSIZE "?oneline/fontsize"
+#define SETTINGS_ONELINE_FONTSTYLE "?oneline/fontstyle"
+#define SETTINGS_ONELINE_FONTWEIGHT "?oneline/fontweight"
+#define SETTINGS_ONELINE_FONTITALIC "?oneline/fontitalic"
+#define SETTINGS_ONELINE_LINESPACE "?oneline/linespace"
+#define SETTINGS_ONELINE_PADDING "?oneline/padding"
+#define SETTINGS_VOICE_VOICE "?voice/voice"
+#define SETTINGS_VOICE_VOLUME "?voice/volume"
+#define SETTINGS_VOICE_PITCH "?voice/pitch"
+#define SETTINGS_VOICE_RATE "?voice/rate"
+#define SETTINGS_INDEXREGEXPS "?app/indexregexps"
+#define SETTINGS_INDEXMAXWORD "?app/indexmaxword"
+#define SETTINGS_REMOVEDUPLICATION "?app/removeduplication"
+#define SETTINGS_QUZA "?app/quza"
+#define SETTINGS_ONELINE_GEOMETRY "?oneline/geometry"
 
 class DialogConfig : public QDialog
 {

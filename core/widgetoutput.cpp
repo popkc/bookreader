@@ -15,6 +15,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 #include "core/widgetoutput.h"
 #include "core/widgetfull.h"
+#include "dialog/dialogconfig.h"
 #include "mainwindow.h"
 #include "pch.h"
 #include "ui_mainwindow.h"
@@ -85,7 +86,7 @@ char *WidgetOutput::getNextPos(char *cpos)
 
 void WidgetOutput::saveState()
 {
-    w->settings->setValue("?oneline/geometry", w->saveGeometry());
+    w->settings->setValue(SETTINGS_ONELINE_GEOMETRY, w->saveGeometry());
 }
 
 void WidgetOutput::restoreState()
@@ -93,7 +94,7 @@ void WidgetOutput::restoreState()
 #ifdef Q_OS_LINUX
     if (!w->inited)
 #endif
-        w->restoreGeometry(w->settings->value("?oneline/geometry").toByteArray());
+        w->restoreGeometry(w->settings->value(SETTINGS_ONELINE_GEOMETRY).toByteArray());
     w->showNormal();
     if (w->width() < 10)
         w->resize(10, w->height());

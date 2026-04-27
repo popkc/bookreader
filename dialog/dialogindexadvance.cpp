@@ -14,6 +14,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 #include "dialog/dialogindexadvance.h"
+#include "dialogconfig.h"
 #include "dialogindex.h"
 #include "mainwindow.h"
 #include "ui_dialogindexadvance.h"
@@ -33,11 +34,11 @@ DialogIndexAdvance::~DialogIndexAdvance()
 void DialogIndexAdvance::init()
 {
     ui->listWidgetIndex->clear();
-    QStringList sl = w->settings->value("?app/indexregexps", DEFAULT_REGEXPS).toStringList();
+    QStringList sl = w->settings->value(SETTINGS_INDEXREGEXPS, DEFAULT_REGEXPS).toStringList();
     ui->listWidgetIndex->addItems(sl);
-    ui->spinBoxMaxWord->setValue(w->settings->value("?app/indexmaxword", DEFAULT_MAXWORD).toInt());
-    ui->checkBoxQuZa->setChecked(w->settings->value("?app/quza", DEFAULT_QUZA).toBool());
-    ui->checkBoxRemoveDuplication->setChecked(w->settings->value("?app/removeduplication", DEFAULT_REMOVEDUPLICATION).toBool());
+    ui->spinBoxMaxWord->setValue(w->settings->value(SETTINGS_INDEXMAXWORD, DEFAULT_MAXWORD).toInt());
+    ui->checkBoxQuZa->setChecked(w->settings->value(SETTINGS_QUZA, DEFAULT_QUZA).toBool());
+    ui->checkBoxRemoveDuplication->setChecked(w->settings->value(SETTINGS_REMOVEDUPLICATION, DEFAULT_REMOVEDUPLICATION).toBool());
 }
 
 void DialogIndexAdvance::on_pushButtonAdd_clicked()
@@ -94,10 +95,10 @@ void DialogIndexAdvance::on_pushButtonOk_clicked()
     for (int i = 0; i < c; i++) {
         sl << ui->listWidgetIndex->item(i)->text();
     }
-    w->settings->setValue("?app/indexregexps", sl);
-    w->settings->setValue("?app/indexmaxword", ui->spinBoxMaxWord->value());
-    w->settings->setValue("?app/quza", ui->checkBoxQuZa->isChecked());
-    w->settings->setValue("?app/removeduplication", ui->checkBoxRemoveDuplication->isChecked());
+    w->settings->setValue(SETTINGS_INDEXREGEXPS, sl);
+    w->settings->setValue(SETTINGS_INDEXMAXWORD, ui->spinBoxMaxWord->value());
+    w->settings->setValue(SETTINGS_QUZA, ui->checkBoxQuZa->isChecked());
+    w->settings->setValue(SETTINGS_REMOVEDUPLICATION, ui->checkBoxRemoveDuplication->isChecked());
     static_cast<DialogIndex *>(parent())->setupRegexps();
     this->accept();
 }

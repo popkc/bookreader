@@ -96,9 +96,9 @@ void MainWindow::init()
     popupMenu.addSeparator();
     popupMenu.addAction(w->ui->actionExit);
 
-    ui->actionShowTray->setChecked(settings->value("?app/showtray", true).toBool());
+    ui->actionShowTray->setChecked(settings->value(SETTINGS_SHOWTRAY, true).toBool());
 
-    if (settings->value("?app/onelinemode", false).toBool())
+    if (settings->value(SETTINGS_ONELINEMODE, false).toBool())
         oneLineMode();
     else {
         fullMode();
@@ -116,7 +116,7 @@ void MainWindow::init()
             connect(ac, SIGNAL(triggered(bool)), this, SLOT(actionCodecTriggered()));
         }
     }
-    QByteArray ba = settings->value("?app/codec").toByteArray();
+    QByteArray ba = settings->value(SETTINGS_CODEC).toByteArray();
     if (!ba.isEmpty()) {
         for (QAction *ac : alist) {
             if (ac->isCheckable() && ac->text().toLocal8Bit() == ba) {
@@ -128,7 +128,7 @@ void MainWindow::init()
     codecTriggered(ui->actionGB18030);
 acfound:;
 
-    recentFiles = settings->value("?app/recentfiles").toStringList();
+    recentFiles = settings->value(SETTINGS_RECENTFILES).toStringList();
     resetRecentFiles();
 
     connect(&timerSave, &QTimer::timeout, this, &MainWindow::onTimerSave);
@@ -152,8 +152,8 @@ void MainWindow::init2()
         hotKeyRead = new QHotkey(QKeySequence(Qt::CTRL + Qt::Key_F12), true, QApplication::instance());
         if (hotKeyRead->isRegistered())
             connect(hotKeyRead, &QHotkey::activated, this, &MainWindow::handleHotKeyRead);
-        else
-            QMessageBox::warning(this, tr("错误"), tr("注册热键Ctrl+F12失败。"));
+        // else
+        //     QMessageBox::warning(this, tr("错误"), tr("注册热键Ctrl+F12失败。"));
     }
     inited = true;
 }
@@ -201,7 +201,7 @@ void MainWindow::fullMode()
     if (trayIcon)
         trayIcon->hide();
 
-    if (settings->value("?app/display", DEFAULT_DISPLAY).toInt() == 0) {
+    if (settings->value(SETTINGS_DISPLAY, DEFAULT_DISPLAY).toInt() == 0) {
         ui->actionWindowed->setChecked(false);
         ui->actionWindowed->trigger();
     }
@@ -241,17 +241,17 @@ void MainWindow::createTrayIcon()
 void MainWindow::setupFont()
 {
     int fontr, fontg, fontb, bgr, bgg, bgb;
-    fontr = settings->value("?app/fontr", DEFAULTFONTR).toInt();
-    fontg = settings->value("?app/fontg", DEFAULTFONTG).toInt();
-    fontb = settings->value("?app/fontb", DEFAULTFONTB).toInt();
-    bgr = settings->value("?app/bgr", DEFAULTBGR).toInt();
-    bgg = settings->value("?app/bgg", DEFAULTBGG).toInt();
-    bgb = settings->value("?app/bgb", DEFAULTBGB).toInt();
-    paintInfo.font.setFamily(settings->value("?app/fontfamily", DEFAULT_FONTFAMALY).toString());
-    paintInfo.font.setPointSize(settings->value("?app/fontsize", DEFAULT_FONTPOINTSIZE).toInt());
-    paintInfo.font.setStyleName(settings->value("?app/fontstyle", DEFAULT_FONTSTYLE).toString());
-    paintInfo.font.setWeight(QFont::Weight(settings->value("?app/fontweight", DEFAULT_FONTPOINTWEIGHT).toInt()));
-    paintInfo.font.setItalic(settings->value("?app/fontitalic", DEFAULT_FONTITALIC).toBool());
+    fontr = settings->value(SETTINGS_FONTR, DEFAULTFONTR).toInt();
+    fontg = settings->value(SETTINGS_FONTG, DEFAULTFONTG).toInt();
+    fontb = settings->value(SETTINGS_FONTB, DEFAULTFONTB).toInt();
+    bgr = settings->value(SETTINGS_BGR, DEFAULTBGR).toInt();
+    bgg = settings->value(SETTINGS_BGG, DEFAULTBGG).toInt();
+    bgb = settings->value(SETTINGS_BGB, DEFAULTBGB).toInt();
+    paintInfo.font.setFamily(settings->value(SETTINGS_FONTFAMILY, DEFAULT_FONTFAMALY).toString());
+    paintInfo.font.setPointSize(settings->value(SETTINGS_FONTSIZE, DEFAULT_FONTPOINTSIZE).toInt());
+    paintInfo.font.setStyleName(settings->value(SETTINGS_FONTSTYLE, DEFAULT_FONTSTYLE).toString());
+    paintInfo.font.setWeight(QFont::Weight(settings->value(SETTINGS_FONTWEIGHT, DEFAULT_FONTPOINTWEIGHT).toInt()));
+    paintInfo.font.setItalic(settings->value(SETTINGS_FONTITALIC, DEFAULT_FONTITALIC).toBool());
 
     if (paintInfo.fontm)
         delete paintInfo.fontm;
@@ -261,31 +261,31 @@ void MainWindow::setupFont()
     // paintInfo.selectedColor.setColor(QColor(255 - bgr, 255 - bgg, 255 - bgb));
     paintInfo.selectedColor.setColor(QColor(bgr < 128 ? 255 : 0, bgg < 128 ? 255 : 0, bgb < 128 ? 255 : 0));
 
-    paintInfo.linespace = settings->value("?app/linespace", DEFAULT_LINESPACE).toUInt();
-    paintInfo.padding = settings->value("?app/padding", DEFAULT_PADDING).toUInt();
-    paintInfo.smartReturn = settings->value("?app/smartreturn", DEFAULT_SMARTRETURN).toBool();
+    paintInfo.linespace = settings->value(SETTINGS_LINESPACE, DEFAULT_LINESPACE).toUInt();
+    paintInfo.padding = settings->value(SETTINGS_PADDING, DEFAULT_PADDING).toUInt();
+    paintInfo.smartReturn = settings->value(SETTINGS_SMARTRETURN, DEFAULT_SMARTRETURN).toBool();
 
-    rollRate = settings->value("?app/rollrate", DEFAULT_ROLLRATE).toInt();
+    rollRate = settings->value(SETTINGS_ROLLRATE, DEFAULT_ROLLRATE).toInt();
     if (rollRate <= MIN_ROLLRATE || rollRate > MAX_ROLLRATE)
         rollRate = DEFAULT_ROLLRATE;
     formRollRate->renewValue();
 
-    if (settings->value("?oneline/sameasfull", ONELINE_SAMEASFULL).toBool()) {
+    if (settings->value(SETTINGS_ONELINE_SAMEASFULL, ONELINE_SAMEASFULL).toBool()) {
         ui->widgetOneLine->pi = &paintInfo;
     }
     else {
         ui->widgetOneLine->pi = &olPaintInfo;
-        fontr = settings->value("?oneline/fontr", ONELINE_FONTR).toInt();
-        fontg = settings->value("?oneline/fontg", ONELINE_FONTG).toInt();
-        fontb = settings->value("?oneline/fontb", ONELINE_FONTB).toInt();
-        bgr = settings->value("?oneline/bgr", ONELINE_BGR).toInt();
-        bgg = settings->value("?oneline/bgg", ONELINE_BGG).toInt();
-        bgb = settings->value("?oneline/bgb", ONELINE_BGB).toInt();
-        olPaintInfo.font.setFamily(settings->value("?oneline/fontfamily", ONELINE_FONTFAMALY).toString());
-        olPaintInfo.font.setPointSize(settings->value("?oneline/fontsize", ONELINE_FONTPOINTSIZE).toInt());
-        olPaintInfo.font.setStyleName(settings->value("?oneline/fontstyle", ONELINE_FONTSTYLE).toString());
-        olPaintInfo.font.setWeight(QFont::Weight(settings->value("?oneline/fontweight", ONELINE_FONTPOINTWEIGHT).toInt()));
-        olPaintInfo.font.setItalic(settings->value("?oneline/fontitalic", ONELINE_FONTITALIC).toBool());
+        fontr = settings->value(SETTINGS_ONELINE_FONTR, ONELINE_FONTR).toInt();
+        fontg = settings->value(SETTINGS_ONELINE_FONTG, ONELINE_FONTG).toInt();
+        fontb = settings->value(SETTINGS_ONELINE_FONTB, ONELINE_FONTB).toInt();
+        bgr = settings->value(SETTINGS_ONELINE_BGR, ONELINE_BGR).toInt();
+        bgg = settings->value(SETTINGS_ONELINE_BGG, ONELINE_BGG).toInt();
+        bgb = settings->value(SETTINGS_ONELINE_BGB, ONELINE_BGB).toInt();
+        olPaintInfo.font.setFamily(settings->value(SETTINGS_ONELINE_FONTFAMILY, ONELINE_FONTFAMALY).toString());
+        olPaintInfo.font.setPointSize(settings->value(SETTINGS_ONELINE_FONTSIZE, ONELINE_FONTPOINTSIZE).toInt());
+        olPaintInfo.font.setStyleName(settings->value(SETTINGS_ONELINE_FONTSTYLE, ONELINE_FONTSTYLE).toString());
+        olPaintInfo.font.setWeight(QFont::Weight(settings->value(SETTINGS_ONELINE_FONTWEIGHT, ONELINE_FONTPOINTWEIGHT).toInt()));
+        olPaintInfo.font.setItalic(settings->value(SETTINGS_ONELINE_FONTITALIC, ONELINE_FONTITALIC).toBool());
 
         if (olPaintInfo.fontm)
             delete olPaintInfo.fontm;
@@ -294,8 +294,8 @@ void MainWindow::setupFont()
         olPaintInfo.fontcolor.setColor(QColor(fontr, fontg, fontb));
         // olPaintInfo.selectedColor.setColor(QColor(255 - bgr, 255 - bgg, 255 - bgb));
 
-        olPaintInfo.linespace = settings->value("?oneline/linespace", ONELINE_LINESPACE).toUInt();
-        olPaintInfo.padding = settings->value("?oneline/padding", ONELINE_PADDING).toUInt();
+        olPaintInfo.linespace = settings->value(SETTINGS_ONELINE_LINESPACE, ONELINE_LINESPACE).toUInt();
+        olPaintInfo.padding = settings->value(SETTINGS_ONELINE_PADDING, ONELINE_PADDING).toUInt();
     }
 
     if (isOneLine)
@@ -306,7 +306,7 @@ void MainWindow::setupFont()
 void MainWindow::setupVoice()
 {
     auto vlist = textToSpeech.availableVoices();
-    QString s = settings->value("?voice/voice").toString();
+    QString s = settings->value(SETTINGS_VOICE_VOICE).toString();
     QVoice voice;
     if (!s.isEmpty()) {
         for (const QVoice &v : vlist) {
@@ -323,9 +323,9 @@ void MainWindow::setupVoice()
         return;
 voiceFound:
     textToSpeech.setVoice(voice);
-    textToSpeech.setVolume(settings->value("?voice/volume", DEFAULTVOLUME).toDouble());
-    textToSpeech.setPitch(settings->value("?voice/pitch", DEFAULTPITCH).toDouble());
-    textToSpeech.setRate(settings->value("?voice/rate", DEFAULTRATE).toDouble());
+    textToSpeech.setVolume(settings->value(SETTINGS_VOICE_VOLUME, DEFAULTVOLUME).toDouble());
+    textToSpeech.setPitch(settings->value(SETTINGS_VOICE_PITCH, DEFAULTPITCH).toDouble());
+    textToSpeech.setRate(settings->value(SETTINGS_VOICE_RATE, DEFAULTRATE).toDouble());
 }
 
 void MainWindow::resetRecentFiles()
@@ -378,7 +378,7 @@ void MainWindow::actionCodecTriggered()
     QAction *ac = static_cast<QAction *>(sender());
     if (ac->isChecked()) {
         codecTriggered(ac);
-        settings->setValue("?app/codec", ac->text().toLocal8Bit());
+        settings->setValue(SETTINGS_CODEC, ac->text().toLocal8Bit());
     }
     else
         ac->setChecked(true);
@@ -401,7 +401,7 @@ void MainWindow::onTimerRoll()
 void MainWindow::closeEvent(QCloseEvent *)
 {
     fileInfo.saveReadPos();
-    settings->setValue("?app/rollrate", rollRate);
+    settings->setValue(SETTINGS_ROLLRATE, rollRate);
     currentOutput->saveState();
     if (trayIcon)
         trayIcon->hide();
@@ -621,7 +621,7 @@ void MainWindow::on_actionFullMode_triggered(bool checked)
 {
     if (checked) {
         fullMode();
-        settings->setValue("?app/onelinemode", false);
+        settings->setValue(SETTINGS_ONELINEMODE, false);
     }
     else
         ui->actionFullMode->setChecked(true);
@@ -634,7 +634,7 @@ void MainWindow::on_actionOneLineMode_triggered(bool checked)
         oneLineMode();
         currentOutput->restoreState();
         static_cast<WidgetOneLine *>(currentOutput)->adjustHeight();
-        settings->setValue("?app/onelinemode", true);
+        settings->setValue(SETTINGS_ONELINEMODE, true);
     }
     else
         ui->actionOneLineMode->setChecked(true);
@@ -646,11 +646,11 @@ void MainWindow::on_actionShowTray_triggered(bool checked)
         if (!trayIcon)
             createTrayIcon();
         trayIcon->show();
-        settings->setValue("?app/showtray", true);
+        settings->setValue(SETTINGS_SHOWTRAY, true);
     }
     else {
         trayIcon->hide();
-        settings->setValue("?app/showtray", false);
+        settings->setValue(SETTINGS_SHOWTRAY, false);
     }
 }
 
@@ -706,7 +706,7 @@ void MainWindow::on_actionFullScreen_triggered()
     }
     else {
         if ((this->windowFlags() & Qt::FramelessWindowHint)) {
-            // if (settings->value("?app/display", DEFAULT_DISPLAY).toInt() != 0) {
+            // if (settings->value(SETTINGS_DISPLAY, DEFAULT_DISPLAY).toInt() != 0) {
             clearDisplayActions(ui->actionNoBorder);
             myMaximized();
         }
@@ -723,7 +723,7 @@ void MainWindow::on_actionNoBorder_triggered()
 {
     bool ic = clearDisplayActions(ui->actionNoBorder);
     if (ic) {
-        settings->setValue("?app/display", 1);
+        settings->setValue(SETTINGS_DISPLAY, 1);
         this->setWindowFlags(Qt::FramelessWindowHint | Qt::Window);
         menuBar()->hide();
         ui->verticalScrollBar->hide();
@@ -735,7 +735,7 @@ void MainWindow::on_actionWindowed_triggered()
 {
     bool ic = clearDisplayActions(ui->actionWindowed);
     if (ic) {
-        settings->setValue("?app/display", 0);
+        settings->setValue(SETTINGS_DISPLAY, 0);
         setWindowFlags(Qt::Window);
         menuBar()->setVisible(true);
         ui->verticalScrollBar->setVisible(true);

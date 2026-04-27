@@ -44,30 +44,30 @@ void DialogConfig::init()
     font = w->paintInfo.font;
 
     int fontr, fontg, fontb, bgr, bgg, bgb;
-    fontr = w->settings->value("?oneline/fontr", ONELINE_FONTR).toInt();
-    fontg = w->settings->value("?oneline/fontg", ONELINE_FONTG).toInt();
-    fontb = w->settings->value("?oneline/fontb", ONELINE_FONTB).toInt();
-    bgr = w->settings->value("?oneline/bgr", ONELINE_BGR).toInt();
-    bgg = w->settings->value("?oneline/bgg", ONELINE_BGG).toInt();
-    bgb = w->settings->value("?oneline/bgb", ONELINE_BGB).toInt();
+    fontr = w->settings->value(SETTINGS_ONELINE_FONTR, ONELINE_FONTR).toInt();
+    fontg = w->settings->value(SETTINGS_ONELINE_FONTG, ONELINE_FONTG).toInt();
+    fontb = w->settings->value(SETTINGS_ONELINE_FONTB, ONELINE_FONTB).toInt();
+    bgr = w->settings->value(SETTINGS_ONELINE_BGR, ONELINE_BGR).toInt();
+    bgg = w->settings->value(SETTINGS_ONELINE_BGG, ONELINE_BGG).toInt();
+    bgb = w->settings->value(SETTINGS_ONELINE_BGB, ONELINE_BGB).toInt();
     olFrontColor.setRgb(fontr, fontg, fontb);
     olBackColor.setRgb(bgr, bgg, bgb);
-    olFont.setFamily(w->settings->value("?oneline/fontfamily", ONELINE_FONTFAMALY).toString());
-    olFont.setPointSize(w->settings->value("?oneline/fontsize", ONELINE_FONTPOINTSIZE).toInt());
-    olFont.setWeight(QFont::Weight(w->settings->value("?oneline/fontweight", ONELINE_FONTPOINTWEIGHT).toInt()));
-    olFont.setItalic(w->settings->value("?oneline/fontitalic", ONELINE_FONTITALIC).toBool());
-    olFont.setStyleName(w->settings->value("?oneline/fontstyle", ONELINE_FONTSTYLE).toString());
+    olFont.setFamily(w->settings->value(SETTINGS_ONELINE_FONTFAMILY, ONELINE_FONTFAMALY).toString());
+    olFont.setPointSize(w->settings->value(SETTINGS_ONELINE_FONTSIZE, ONELINE_FONTPOINTSIZE).toInt());
+    olFont.setWeight(QFont::Weight(w->settings->value(SETTINGS_ONELINE_FONTWEIGHT, ONELINE_FONTPOINTWEIGHT).toInt()));
+    olFont.setItalic(w->settings->value(SETTINGS_ONELINE_FONTITALIC, ONELINE_FONTITALIC).toBool());
+    olFont.setStyleName(w->settings->value(SETTINGS_ONELINE_FONTSTYLE, ONELINE_FONTSTYLE).toString());
 
     ui->spinBoxLineSpace->setValue(w->paintInfo.linespace);
     ui->spinBoxPadding->setValue(w->paintInfo.padding);
-    ui->checkBoxSmartReturn->setChecked(w->settings->value("?app/smartreturn", DEFAULT_SMARTRETURN).toBool());
+    ui->checkBoxSmartReturn->setChecked(w->settings->value(SETTINGS_SMARTRETURN, DEFAULT_SMARTRETURN).toBool());
 
-    ui->spinBoxOLLineSpace->setValue(w->settings->value("?oneline/linespace", ONELINE_LINESPACE).toUInt());
-    ui->spinBoxOLPadding->setValue(w->settings->value("?oneline/padding", ONELINE_PADDING).toUInt());
-    ui->checkBoxSameAsFull->setChecked(w->settings->value("?oneline/sameasfull", ONELINE_SAMEASFULL).toBool());
+    ui->spinBoxOLLineSpace->setValue(w->settings->value(SETTINGS_ONELINE_LINESPACE, ONELINE_LINESPACE).toUInt());
+    ui->spinBoxOLPadding->setValue(w->settings->value(SETTINGS_ONELINE_PADDING, ONELINE_PADDING).toUInt());
+    ui->checkBoxSameAsFull->setChecked(w->settings->value(SETTINGS_ONELINE_SAMEASFULL, ONELINE_SAMEASFULL).toBool());
 
     auto vlist = w->textToSpeech.availableVoices();
-    QString s = w->settings->value("?voice/voice").toString();
+    QString s = w->settings->value(SETTINGS_VOICE_VOICE).toString();
     if (!s.isEmpty()) {
         for (int i = 0; i < vlist.size(); i++) {
             if (vlist[i].name() == s) {
@@ -79,9 +79,9 @@ void DialogConfig::init()
 
     ui->comboBoxVoice->setCurrentIndex(0);
 voiceFound:;
-    ui->horizontalSliderVolume->setValue(w->settings->value("?voice/volume", DEFAULTVOLUME).toDouble() * 100);
-    ui->horizontalSliderRate->setValue(w->settings->value("?voice/rate", DEFAULTRATE).toDouble() * 100);
-    ui->horizontalSliderPitch->setValue(w->settings->value("?voice/pitch", DEFAULTPITCH).toDouble() * 100);
+    ui->horizontalSliderVolume->setValue(w->settings->value(SETTINGS_VOICE_VOLUME, DEFAULTVOLUME).toDouble() * 100);
+    ui->horizontalSliderRate->setValue(w->settings->value(SETTINGS_VOICE_RATE, DEFAULTRATE).toDouble() * 100);
+    ui->horizontalSliderPitch->setValue(w->settings->value(SETTINGS_VOICE_PITCH, DEFAULTPITCH).toDouble() * 100);
     on_horizontalSliderVolume_valueChanged(ui->horizontalSliderVolume->value());
     on_horizontalSliderRate_valueChanged(ui->horizontalSliderRate->value());
     on_horizontalSliderPitch_valueChanged(ui->horizontalSliderPitch->value());
@@ -91,45 +91,45 @@ voiceFound:;
 
 void DialogConfig::save()
 {
-    w->settings->setValue("?app/fontr", frontColor.red());
-    w->settings->setValue("?app/fontg", frontColor.green());
-    w->settings->setValue("?app/fontb", frontColor.blue());
-    w->settings->setValue("?app/bgr", backColor.red());
-    w->settings->setValue("?app/bgg", backColor.green());
-    w->settings->setValue("?app/bgb", backColor.blue());
-    w->settings->setValue("?app/fontfamily", font.family());
-    w->settings->setValue("?app/fontsize", font.pointSize());
-    w->settings->setValue("?app/fontstyle", font.styleName());
-    w->settings->setValue("?app/fontweight", font.weight());
-    w->settings->setValue("?app/fontitalic", font.italic());
-    w->settings->setValue("?app/linespace", ui->spinBoxLineSpace->value());
-    w->settings->setValue("?app/padding", ui->spinBoxPadding->value());
-    w->settings->setValue("?app/rollrate", ui->horizontalSliderRollRate->value());
-    w->settings->setValue("?app/smartreturn", ui->checkBoxSmartReturn->isChecked());
+    w->settings->setValue(SETTINGS_FONTR, frontColor.red());
+    w->settings->setValue(SETTINGS_FONTG, frontColor.green());
+    w->settings->setValue(SETTINGS_FONTB, frontColor.blue());
+    w->settings->setValue(SETTINGS_BGR, backColor.red());
+    w->settings->setValue(SETTINGS_BGG, backColor.green());
+    w->settings->setValue(SETTINGS_BGB, backColor.blue());
+    w->settings->setValue(SETTINGS_FONTFAMILY, font.family());
+    w->settings->setValue(SETTINGS_FONTSIZE, font.pointSize());
+    w->settings->setValue(SETTINGS_FONTSTYLE, font.styleName());
+    w->settings->setValue(SETTINGS_FONTWEIGHT, font.weight());
+    w->settings->setValue(SETTINGS_FONTITALIC, font.italic());
+    w->settings->setValue(SETTINGS_LINESPACE, ui->spinBoxLineSpace->value());
+    w->settings->setValue(SETTINGS_PADDING, ui->spinBoxPadding->value());
+    w->settings->setValue(SETTINGS_ROLLRATE, ui->horizontalSliderRollRate->value());
+    w->settings->setValue(SETTINGS_SMARTRETURN, ui->checkBoxSmartReturn->isChecked());
 
-    w->settings->setValue("?oneline/fontr", olFrontColor.red());
-    w->settings->setValue("?oneline/fontg", olFrontColor.green());
-    w->settings->setValue("?oneline/fontb", olFrontColor.blue());
-    w->settings->setValue("?oneline/bgr", olBackColor.red());
-    w->settings->setValue("?oneline/bgg", olBackColor.green());
-    w->settings->setValue("?oneline/bgb", olBackColor.blue());
-    w->settings->setValue("?oneline/fontfamily", olFont.family());
-    w->settings->setValue("?oneline/fontsize", olFont.pointSize());
-    w->settings->setValue("?oneline/fontstyle", olFont.styleName());
-    w->settings->setValue("?oneline/fontweight", olFont.weight());
-    w->settings->setValue("?oneline/fontitalic", olFont.italic());
-    w->settings->setValue("?oneline/linespace", ui->spinBoxOLLineSpace->value());
-    w->settings->setValue("?oneline/padding", ui->spinBoxOLPadding->value());
-    w->settings->setValue("?oneline/sameasfull", ui->checkBoxSameAsFull->isChecked());
+    w->settings->setValue(SETTINGS_ONELINE_FONTR, olFrontColor.red());
+    w->settings->setValue(SETTINGS_ONELINE_FONTG, olFrontColor.green());
+    w->settings->setValue(SETTINGS_ONELINE_FONTB, olFrontColor.blue());
+    w->settings->setValue(SETTINGS_ONELINE_BGR, olBackColor.red());
+    w->settings->setValue(SETTINGS_ONELINE_BGG, olBackColor.green());
+    w->settings->setValue(SETTINGS_ONELINE_BGB, olBackColor.blue());
+    w->settings->setValue(SETTINGS_ONELINE_FONTFAMILY, olFont.family());
+    w->settings->setValue(SETTINGS_ONELINE_FONTSIZE, olFont.pointSize());
+    w->settings->setValue(SETTINGS_ONELINE_FONTSTYLE, olFont.styleName());
+    w->settings->setValue(SETTINGS_ONELINE_FONTWEIGHT, olFont.weight());
+    w->settings->setValue(SETTINGS_ONELINE_FONTITALIC, olFont.italic());
+    w->settings->setValue(SETTINGS_ONELINE_LINESPACE, ui->spinBoxOLLineSpace->value());
+    w->settings->setValue(SETTINGS_ONELINE_PADDING, ui->spinBoxOLPadding->value());
+    w->settings->setValue(SETTINGS_ONELINE_SAMEASFULL, ui->checkBoxSameAsFull->isChecked());
 
     w->setupFont();
 
     auto vlist = tts.availableVoices();
     if (ui->comboBoxVoice->count() > 0)
-        w->settings->setValue("?voice/voice", vlist[ui->comboBoxVoice->currentIndex()].name());
-    w->settings->setValue("?voice/volume", ui->horizontalSliderVolume->value() / 100.0);
-    w->settings->setValue("?voice/rate", ui->horizontalSliderRate->value() / 100.0);
-    w->settings->setValue("?voice/pitch", ui->horizontalSliderPitch->value() / 100.0);
+        w->settings->setValue(SETTINGS_VOICE_VOICE, vlist[ui->comboBoxVoice->currentIndex()].name());
+    w->settings->setValue(SETTINGS_VOICE_VOLUME, ui->horizontalSliderVolume->value() / 100.0);
+    w->settings->setValue(SETTINGS_VOICE_RATE, ui->horizontalSliderRate->value() / 100.0);
+    w->settings->setValue(SETTINGS_VOICE_PITCH, ui->horizontalSliderPitch->value() / 100.0);
     w->setupVoice();
 
     w->currentOutput->needRedraw = true;

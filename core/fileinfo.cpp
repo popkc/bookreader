@@ -60,7 +60,7 @@ void FileInfo::loadFile(const QString &fn)
         w->recentFiles.removeDuplicates();
         while (w->recentFiles.size() > 20)
             w->recentFiles.removeLast();
-        w->settings->setValue("?app/recentfiles", w->recentFiles);
+        w->settings->setValue(SETTINGS_RECENTFILES, w->recentFiles);
         w->resetRecentFiles();
     }
 
