@@ -17,7 +17,6 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include "core/widgetoutput.h"
 #include "dialog/dialogconfig.h"
 #include "mainwindow.h"
-#include "pch.h"
 #include "ui_mainwindow.h"
 
 FileInfo::FileInfo(QObject *parent)

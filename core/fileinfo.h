@@ -18,7 +18,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include "pch.h"
 
 #ifndef BOOKREADER_USE_QTSPEECH
-#    include "core/texttospeech.h"
+#    include "texttospeech/texttospeech.h"
 using namespace popkc;
 #endif
 
